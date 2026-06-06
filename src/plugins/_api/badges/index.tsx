@@ -59,8 +59,8 @@ const MallCordFounderBadge: ProfileBadge = {
 
     props: {
         style: {
-            borderRadius: "50%",
-            transform: "scale(0.9)"
+            borderRadius: "100%",
+            transform: "scale(0.16)"
         }
     },
 };
