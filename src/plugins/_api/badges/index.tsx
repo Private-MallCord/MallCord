@@ -44,6 +44,8 @@ const USERPLUGIN_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const MALLCORD_DEV_BADGE = "https://i.pinimg.com/736x/0d/7a/bd/0d7abdc86f81fff675983ca4e63d23a3.jpg";
 const FOUNDER_BADGE = "https://iili.io/C3jZGrg.th.png";
 
+const FRIEND_BADGE = "https://i.pinimg.com/736x/0d/7a/bd/0d7abdc86f81fff675983ca4e63d23a3.jpg";
+
 const MallCordFounderBadge: ProfileBadge = {
     id: "mallcord_founder_badge",
     description: "MallCord Founder",
@@ -73,6 +75,23 @@ const MallCordDevBadge: ProfileBadge = {
         userId === "1469765555480297723",
 
     onClick: () => MallCordDevModal(),
+
+    props: {
+        style: {
+            borderRadius: "50%",
+            transform: "scale(0.9)"
+        }
+    },
+};
+
+const MallCordFriendBadge: ProfileBadge = {
+    id: "mallcord_friend_badge",
+    description: "MallCord Friend",
+    iconSrc: FRIEND_BADGE,
+    position: BadgePosition.START,
+
+    shouldShow: ({ userId }) =>
+        userId === "1345836898106736790",
 
     props: {
         style: {
@@ -248,6 +267,7 @@ export default definePlugin({
     userProfileBadges: [
         MallCordFounderBadge,
         MallCordDevBadge,
+        MallCordFriendBadge,
         MallCordContributorBadge,
         UserPluginContributorBadge
     ],
