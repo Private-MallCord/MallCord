@@ -42,9 +42,9 @@ import {
 const MALLCORD_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const USERPLUGIN_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const MALLCORD_DEV_BADGE = "https://iili.io/CfaMp94.png";
-const FOUNDER_BADGE = "https://iili.io/C3jZGrg.th.png";
+const FOUNDER_BADGE = "https://iili.io/CfaXwt2.png";
 
-const FRIEND_BADGE = "https://freeimage.host/i/CfaXjwl";
+const FRIEND_BADGE = "https://iili.io/CfaXjwl.gif";
 
 const MallCordFounderBadge: ProfileBadge = {
     id: "mallcord_founder_badge",
