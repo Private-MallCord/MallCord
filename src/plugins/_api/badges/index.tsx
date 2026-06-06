@@ -42,7 +42,7 @@ import {
 const MALLCORD_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const USERPLUGIN_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const MALLCORD_DEV_BADGE = "https://i.pinimg.com/736x/0d/7a/bd/0d7abdc86f81fff675983ca4e63d23a3.jpg";
-const FOUNDER_BADGE = "https://iili.io/C3jZGrg.th.png";
+const FOUNDER_BADGE = "https://freeimage.host/i/Cfa0a1f";
 
 const FRIEND_BADGE = "https://freeimage.host/i/CfaYXl2";
 
