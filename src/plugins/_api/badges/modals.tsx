@@ -221,7 +221,7 @@ export function MallCordFounderModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            User ID: 1469765555480297723
+                            
                         </Paragraph>
                     </div>
                 </div>
@@ -380,7 +380,7 @@ export function MallCordFriendModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            User ID: 1345836898106736790
+                            
                         </Paragraph>
                     </div>
                 </div>
