@@ -13,6 +13,8 @@ import { DonateButton, TranslateButton } from "@components/settings";
 import { Margins } from "@utils/margins";
 import { Modal, openModal } from "@webpack/common";
 
+const KO_FI_LINK = "https://ko-fi.com/nidoworkrealgmailcom";
+
 export function VencordDonorModal() {
     openModal(props => (
         <ErrorBoundary noop onError={() => {
@@ -60,7 +62,7 @@ export function VencordDonorModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            Please consider supporting the development of Vencord by becoming a donor. It would mean a lot!!
+                            Please consider supporting the development of Vencord by becoming a donor.
                         </Paragraph>
                     </div>
                 </div>
@@ -79,6 +81,7 @@ export function MallCordDonorModal() {
     openModal(props => (
         <ErrorBoundary noop onError={() => {
             props.onClose();
+            VencordNative.native.openExternal(KO_FI_LINK);
         }}>
             <Modal
                 {...props}
@@ -119,14 +122,18 @@ export function MallCordDonorModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            Support MallCord to unlock this badge and help the project grow!
+                            Support MallCord on Ko-fi to unlock this badge and support development.
                         </Paragraph>
                     </div>
                 </div>
 
                 <div>
                     <Flex justifyContent="center" style={{ width: "100%" }}>
-                        <DonateButton />
+                        <DonateButton
+                            onClick={() => {
+                                VencordNative.native.openExternal(KO_FI_LINK);
+                            }}
+                        />
                     </Flex>
                 </div>
             </Modal>
@@ -168,7 +175,7 @@ export function MallCordTranslatorModal() {
 
                     <div className="vc-translate-modal-paragraph">
                         <Paragraph>
-                            Awarded to contributors who expand MallCord’s language support by translating content for the community.
+                            Awarded to contributors who expand MallCord language support.
                         </Paragraph>
                     </div>
                 </div>
@@ -224,6 +231,10 @@ export function MallCordFounderModal() {
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
                             This badge belongs to the founder of MallCord.
+                        </Paragraph>
+
+                        <Paragraph className={Margins.top20}>
+                            
                         </Paragraph>
                     </div>
                 </div>
@@ -312,7 +323,7 @@ export function MallCordDevModal() {
                     <Flex>
                         <img
                             role="presentation"
-                            src="https://iili.io/C3jZGrg.th.png"
+                            src="https://iili.io/CfaMp94.png"
                             alt=""
                             style={{
                                 margin: "auto",
@@ -329,7 +340,7 @@ export function MallCordDevModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            Special developer badge for MallCord staff.
+                            Official developer badge for MallCord staff.
                         </Paragraph>
                     </div>
                 </div>
