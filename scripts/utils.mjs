@@ -22,9 +22,21 @@
  */
 export function getPluginTarget(filePath) {
     const pathParts = filePath.split(/[/\\]/);
-    if (/^index\.tsx?$/.test(pathParts.at(-1))) pathParts.pop();
 
-    const identifier = pathParts.at(-1).replace(/\.tsx?$/, "");
+    if (/^index\.tsx?$/.test(pathParts.at(-1) || "")) {
+        pathParts.pop();
+    }
+
+    const lastPart = pathParts.at(-1);
+
+    if (!lastPart) {
+        return null;
+    }
+
+    const identifier = lastPart.replace(/\.tsx?$/, "");
     const identiferBits = identifier.split(".");
-    return identiferBits.length === 1 ? null : identiferBits.at(-1);
+
+    return identiferBits.length === 1
+        ? null
+        : identiferBits.at(-1);
 }
