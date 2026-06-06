@@ -138,7 +138,8 @@ const MallCordFriendBadge: ProfileBadge = {
     position: BadgePosition.START,
 
     shouldShow: ({ userId }) =>
-        userId === "1345836898106736790",
+        userId === "1345836898106736790" ||
+        userId === "1385182510396477557",
 
     props: {
         style: {
