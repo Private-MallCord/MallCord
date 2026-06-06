@@ -13,8 +13,6 @@ import { DonateButton, TranslateButton } from "@components/settings";
 import { Margins } from "@utils/margins";
 import { Modal, openModal } from "@webpack/common";
 
-const KO_FI_LINK = "https://ko-fi.com/nidoworkrealgmailcom";
-
 export function VencordDonorModal() {
     openModal(props => (
         <ErrorBoundary noop onError={() => {
@@ -81,7 +79,6 @@ export function MallCordDonorModal() {
     openModal(props => (
         <ErrorBoundary noop onError={() => {
             props.onClose();
-            VencordNative.native.openExternal(KO_FI_LINK);
         }}>
             <Modal
                 {...props}
@@ -129,11 +126,7 @@ export function MallCordDonorModal() {
 
                 <div>
                     <Flex justifyContent="center" style={{ width: "100%" }}>
-                        <DonateButton
-                            onClick={() => {
-                                VencordNative.native.openExternal(KO_FI_LINK);
-                            }}
-                        />
+                        <DonateButton mallcord />
                     </Flex>
                 </div>
             </Modal>
@@ -231,10 +224,6 @@ export function MallCordFounderModal() {
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
                             This badge belongs to the founder of MallCord.
-                        </Paragraph>
-
-                        <Paragraph className={Margins.top20}>
-                            
                         </Paragraph>
                     </div>
                 </div>
