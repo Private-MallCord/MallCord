@@ -23,12 +23,21 @@ import { openInviteModal } from "@utils/discord";
 import { ButtonProps } from "@vencord/discord-types";
 import { showToast } from "@webpack/common";
 
+const MALLCORD_SUPPORT_LINK = "https://ko-fi.com/nidoworkrealgmailcom";
+const VENCORD_SUPPORT_LINK = "https://github.com/sponsors/Vendicated";
+const TRANSLATE_LINK = "https://weblate.equicord.org/projects/mallcord/";
+
 export function DonateButton({
     mallcord = false,
     className,
+    children,
     ...props
 }: Partial<ButtonProps> & { mallcord?: boolean; }) {
-    const link = mallcord ? "https://github.com/sponsors/thororen1234" : "https://github.com/sponsors/Vendicated";
+
+    const link = mallcord
+        ? MALLCORD_SUPPORT_LINK
+        : VENCORD_SUPPORT_LINK;
+
     return (
         <Button
             {...props}
@@ -39,7 +48,7 @@ export function DonateButton({
             className={className || "vc-donate-button"}
         >
             <Heart />
-            Donate
+            {children || (mallcord ? "Support MallCord" : "Donate")}
         </Button>
     );
 }
@@ -56,6 +65,7 @@ export function InviteButton({
             type="button"
             onClick={async e => {
                 e.preventDefault();
+
                 openInviteModal("wKgT9j2xfN").catch(() =>
                     showToast("Invalid or expired invite"),
                 );
@@ -72,17 +82,39 @@ export function TranslateButton({
     className,
     ...props
 }: Partial<ButtonProps>) {
-    const link = "https://weblate.equicord.org/projects/mallcord/";
     return (
         <Button
             {...props}
             variant="none"
             size="medium"
             type="button"
-            onClick={() => VencordNative.native.openExternal(link)}
+            onClick={() =>
+                VencordNative.native.openExternal(TRANSLATE_LINK)
+            }
             className={className || "vc-translate-button"}
         >
             Translate Here
+        </Button>
+    );
+}
+
+export function SupportMallCordButton({
+    className,
+    ...props
+}: Partial<ButtonProps>) {
+    return (
+        <Button
+            {...props}
+            variant="none"
+            size="medium"
+            type="button"
+            onClick={() =>
+                VencordNative.native.openExternal(MALLCORD_SUPPORT_LINK)
+            }
+            className={className || "vc-donate-button"}
+        >
+            <Heart />
+            Support MallCord
         </Button>
     );
 }
