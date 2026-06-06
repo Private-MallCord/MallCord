@@ -6,14 +6,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import "./fixDiscordBadgePadding.css";
@@ -35,7 +27,6 @@ import {
     MallCordDevModal,
     MallCordDonorModal,
     MallCordFounderModal,
-    MallCordTranslatorModal,
     VencordDonorModal
 } from "./modals";
 
@@ -46,17 +37,20 @@ const FOUNDER_BADGE = "https://iili.io/CfaXwt2.png";
 const FRIEND_BADGE = "https://iili.io/CfaXjwl.gif";
 const DONOR_BADGE = "https://iili.io/CfG9TKb.gif";
 
+const MALLCORD_SUPPORTER_IDS = new Set<string>([
+    "1469765555480297723"
+]);
+
+const DonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
+let MallCordDonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
+
 const MallCordFounderBadge: ProfileBadge = {
     id: "mallcord_founder_badge",
     description: "MallCord Founder",
     iconSrc: FOUNDER_BADGE,
     position: BadgePosition.START,
-
-    shouldShow: ({ userId }) =>
-        userId === "1469765555480297723",
-
+    shouldShow: ({ userId }) => userId === "1469765555480297723",
     onClick: () => MallCordFounderModal(),
-
     props: {
         style: {
             borderRadius: "50%",
@@ -70,12 +64,8 @@ const MallCordDevBadge: ProfileBadge = {
     description: "MallCord Dev",
     iconSrc: MALLCORD_DEV_BADGE,
     position: BadgePosition.START,
-
-    shouldShow: ({ userId }) =>
-        userId === "1469765555480297723",
-
+    shouldShow: ({ userId }) => userId === "1469765555480297723",
     onClick: () => MallCordDevModal(),
-
     props: {
         style: {
             borderRadius: "50%",
@@ -89,10 +79,7 @@ const MallCordFriendBadge: ProfileBadge = {
     description: "MallCord Friend",
     iconSrc: FRIEND_BADGE,
     position: BadgePosition.START,
-
-    shouldShow: ({ userId }) =>
-        userId === "1345836898106736790",
-
+    shouldShow: ({ userId }) => userId === "1345836898106736790",
     props: {
         style: {
             borderRadius: "50%",
@@ -106,15 +93,13 @@ const MallCordDonorBadge: ProfileBadge = {
     description: "MallCord Supporter",
     iconSrc: DONOR_BADGE,
     position: BadgePosition.START,
-
     shouldShow: ({ userId }) =>
-        MallCordDonorBadges[userId]?.some(badge =>
+        MALLCORD_SUPPORTER_IDS.has(userId) ||
+        (MallCordDonorBadges[userId]?.some(badge =>
             badge.tooltip === "MallCord Donor" ||
             badge.tooltip === "MallCord Supporter"
-        ) ?? false,
-
+        ) ?? false),
     onClick: () => MallCordDonorModal(),
-
     props: {
         style: {
             borderRadius: "50%",
@@ -128,12 +113,8 @@ const MallCordContributorBadge: ProfileBadge = {
     description: "MallCord Contributor",
     iconSrc: MALLCORD_CONTRIBUTOR_BADGE,
     position: BadgePosition.START,
-
-    shouldShow: ({ userId }) =>
-        shouldShowMallCordContributorBadge(userId),
-
+    shouldShow: ({ userId }) => shouldShowMallCordContributorBadge(userId),
     onClick: () => MallCordContributorModal(),
-
     props: {
         style: {
             borderRadius: "50%",
@@ -147,7 +128,6 @@ const UserPluginContributorBadge: ProfileBadge = {
     description: "User Plugin Contributor",
     iconSrc: USERPLUGIN_CONTRIBUTOR_BADGE,
     position: BadgePosition.START,
-
     shouldShow: ({ userId }) => {
         if (!IS_DEV) return false;
 
@@ -160,10 +140,7 @@ const UserPluginContributorBadge: ProfileBadge = {
                 p.authors.some(a => a.id.toString() === userId);
         });
     },
-
-    onClick: (_, { userId }) =>
-        openContributorModal(UserStore.getUser(userId)),
-
+    onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId)),
     props: {
         style: {
             borderRadius: "50%",
@@ -171,16 +148,6 @@ const UserPluginContributorBadge: ProfileBadge = {
         }
     },
 };
-
-const DonorBadges = {} as Record<
-    string,
-    Array<Record<"tooltip" | "badge", string>>
->;
-
-let MallCordDonorBadges = {} as Record<
-    string,
-    Array<Record<"tooltip" | "badge", string>>
->;
 
 async function loadBadges(url: string, noCache = false) {
     const init = {} as RequestInit;
@@ -192,22 +159,17 @@ async function loadBadges(url: string, noCache = false) {
 }
 
 async function loadAllBadges(noCache = false) {
-    const mallcordBadges =
-        await loadBadges(
-            "https://badge.equicord.org/badges.json",
-            noCache
-        );
+    const mallcordBadges = await loadBadges(
+        "https://badge.equicord.org/badges.json",
+        noCache
+    );
 
     MallCordDonorBadges = mallcordBadges;
 }
 
 let intervalId: any;
 
-export function BadgeContextMenu({
-    badge
-}: {
-    badge: Omit<ProfileBadge, "id"> & BadgeUserArgs;
-}) {
+export function BadgeContextMenu({ badge }: { badge: Omit<ProfileBadge, "id"> & BadgeUserArgs; }) {
     return (
         <Menu.Menu
             navId="vc-badge-context"
@@ -299,21 +261,14 @@ export default definePlugin({
         await loadAllBadges();
 
         clearInterval(intervalId);
-
-        intervalId = setInterval(
-            loadAllBadges,
-            1000 * 60 * 30
-        );
+        intervalId = setInterval(loadAllBadges, 1000 * 60 * 30);
     },
 
     async stop() {
         clearInterval(intervalId);
     },
 
-    getBadges(profile: {
-        userId: string;
-        guildId: string;
-    }) {
+    getBadges(profile: { userId: string; guildId: string; }) {
         if (!profile) return [];
 
         try {
@@ -324,21 +279,13 @@ export default definePlugin({
         }
     },
 
-    renderBadgeComponent: ErrorBoundary.wrap(
-        (badge: ProfileBadge & BadgeUserArgs) => {
-            const Component = badge.component!;
-            return <Component {...badge} />;
-        },
-        { noop: true }
-    ),
+    renderBadgeComponent: ErrorBoundary.wrap((badge: ProfileBadge & BadgeUserArgs) => {
+        const Component = badge.component!;
+        return <Component {...badge} />;
+    }, { noop: true }),
 
-    getBadgeMouseEventHandlers(
-        badge: ProfileBadge & BadgeUserArgs
-    ) {
-        const handlers = {} as Record<
-            string,
-            (e: React.MouseEvent) => void
-        >;
+    getBadgeMouseEventHandlers(badge: ProfileBadge & BadgeUserArgs) {
+        const handlers = {} as Record<string, (e: React.MouseEvent) => void>;
 
         if (!badge) return handlers;
 
@@ -359,21 +306,18 @@ export default definePlugin({
             iconSrc: badge.badge,
             description: badge.tooltip,
             position: BadgePosition.START,
-
             props: {
                 style: {
                     borderRadius: "50%",
                     transform: "scale(0.9)"
                 }
             },
-
             onContextMenu(event, badge) {
                 ContextMenuApi.openContextMenu(
                     event,
                     () => <BadgeContextMenu badge={badge} />
                 );
             },
-
             onClick() {
                 return VencordDonorModal();
             },
@@ -386,25 +330,20 @@ export default definePlugin({
             iconSrc: badge.badge,
             description: badge.tooltip,
             position: BadgePosition.START,
-
             props: {
                 style: {
                     borderRadius: "50%",
                     transform: "scale(0.9)"
                 }
             },
-
             onContextMenu(event, badge) {
                 ContextMenuApi.openContextMenu(
                     event,
                     () => <BadgeContextMenu badge={badge} />
                 );
             },
-
             onClick() {
-                return badge.tooltip === "MallCord Translator"
-                    ? MallCordTranslatorModal()
-                    : MallCordDonorModal();
+                return MallCordDonorModal();
             },
         } satisfies ProfileBadge));
     }
