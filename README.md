@@ -6,7 +6,7 @@
 
 > aesthetic vibes for your client.
 
-**MallCord** is a vaporwave-inspired Discord client mod by **matthew (unfamiliardev)**. It is a rebrand and reskin of
+**MallCord** is a vaporwave-inspired Discord client mod by **Sonnyasd (sonnyasd)**. It is a rebrand and reskin of
 [Equicord](https://github.com/Equicord/Equicord), which is itself an enhanced fork of
 [Vencord](https://github.com/Vendicated/Vencord) bundling 300+ community plugins.
 
