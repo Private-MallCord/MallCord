@@ -221,7 +221,7 @@ export function MallCordFounderModal() {
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                                     
+                            User ID: 1469765555480297723
                         </Paragraph>
                     </div>
                 </div>
@@ -328,6 +328,59 @@ export function MallCordDevModal() {
 
                         <Paragraph className={Margins.top20}>
                             Special developer badge for MallCord staff.
+                        </Paragraph>
+                    </div>
+                </div>
+            </Modal>
+        </ErrorBoundary>
+    ));
+}
+
+export function MallCordFriendModal() {
+    openModal(props => (
+        <ErrorBoundary noop onError={() => {
+            props.onClose();
+        }}>
+            <Modal
+                {...props}
+                title={
+                    <Heading
+                        tag="h2"
+                        style={{
+                            width: "100%",
+                            textAlign: "center",
+                            margin: 0
+                        }}
+                    >
+                        <Flex justifyContent="center" alignItems="center" gap="0.5em">
+                            <Heart />
+                            MallCord Friend
+                        </Flex>
+                    </Heading>
+                }
+            >
+                <div>
+                    <Flex>
+                        <img
+                            role="presentation"
+                            src="https://i.pinimg.com/736x/0d/7a/bd/0d7abdc86f81fff675983ca4e63d23a3.jpg"
+                            alt=""
+                            style={{
+                                margin: "auto",
+                                width: "96px",
+                                height: "96px",
+                                borderRadius: "50%"
+                            }}
+                        />
+                    </Flex>
+
+                    <div style={{ padding: "1em" }}>
+                        <Paragraph>
+                            This badge belongs to a close friend of MallCord.
+                        </Paragraph>
+
+                        <Paragraph className={Margins.top20}>
+                            User ID: 1345836898106736790
                         </Paragraph>
                     </div>
                 </div>
