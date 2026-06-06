@@ -93,7 +93,7 @@ export function MallCordDonorModal() {
                     >
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
-                            MallCord Donor
+                            MallCord Supporter
                         </Flex>
                     </Heading>
                 }
@@ -102,7 +102,7 @@ export function MallCordDonorModal() {
                     <Flex>
                         <img
                             role="presentation"
-                            src="https://iili.io/C3jZGrg.th.png"
+                            src="https://iili.io/CfG9TKb.gif"
                             alt=""
                             style={{
                                 margin: "auto",
@@ -115,13 +115,19 @@ export function MallCordDonorModal() {
 
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
-                            This badge is a special perk for MallCord Donors.
+                            This badge is a special perk for MallCord Supporters.
                         </Paragraph>
 
                         <Paragraph className={Margins.top20}>
-                            Thank you for supporting MallCord!
+                            Support MallCord to unlock this badge and help the project grow!
                         </Paragraph>
                     </div>
+                </div>
+
+                <div>
+                    <Flex justifyContent="center" style={{ width: "100%" }}>
+                        <DonateButton />
+                    </Flex>
                 </div>
             </Modal>
         </ErrorBoundary>
@@ -218,10 +224,6 @@ export function MallCordFounderModal() {
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
                             This badge belongs to the founder of MallCord.
-                        </Paragraph>
-
-                        <Paragraph className={Margins.top20}>
-                            
                         </Paragraph>
                     </div>
                 </div>
@@ -377,10 +379,6 @@ export function MallCordFriendModal() {
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
                             This badge belongs to a close friend of MallCord.
-                        </Paragraph>
-
-                        <Paragraph className={Margins.top20}>
-                            
                         </Paragraph>
                     </div>
                 </div>
