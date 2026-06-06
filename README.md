@@ -47,7 +47,7 @@ npm i -g pnpm
 Clone MallCord:
 
 ```shell
-git clone https://github.com/MallCord/MallCord
+git clone https://github.com/Sonnyasd/MallCord
 cd MallCord
 ```
 
@@ -83,7 +83,7 @@ Note: Firefox extension zip requires Firefox for developers
 
 Need help, want to report a bug, or just hang out? Join the MallCord Discord server:
 
-**https://discord.gg/VBAJFf6fY6**
+**https://discord.gg/**
 
 ## Credits
 
