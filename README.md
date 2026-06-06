@@ -16,12 +16,13 @@
 
 **Linux / macOS**
 ```sh
-wget https://raw.githubusercontent.com/MallCord/MallCord/refs/heads/main/misc/install.sh && chmod +x install.sh && ./install.sh
+wget https://raw.githubusercontent.com/Sonnyasd/MallCord/refs/heads/main/misc/install.sh && chmod +x install.sh && ./install.sh
 ```
 
 **Windows** — 
 ```sh
-irm "https://raw.githubusercontent.com/MallCord/MallCord/main/misc/install.bat" -OutFile install.bat; .\install.bat
+irm "https://raw.githubusercontent.com/Sonnyasd/MallCord/main/misc/install.bat" -OutFile install.bat
+.\install.bat
 ```
 The script checks all dependencies, clones the repo, builds, and injects into Discord automatically.
 
