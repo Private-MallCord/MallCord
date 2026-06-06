@@ -41,7 +41,7 @@ import {
 
 const MALLCORD_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const USERPLUGIN_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
-const MALLCORD_DEV_BADGE = "https://i.pinimg.com/736x/0d/7a/bd/0d7abdc86f81fff675983ca4e63d23a3.jpg";
+const MALLCORD_DEV_BADGE = "https://freeimage.host/i/CfaMp94";
 const FOUNDER_BADGE = "https://freeimage.host/i/CfaEOOB";
 
 const FRIEND_BADGE = "https://freeimage.host/i/CfaYXl2";
@@ -60,7 +60,7 @@ const MallCordFounderBadge: ProfileBadge = {
     props: {
         style: {
             borderRadius: "50%",
-            transform: "scale(0.10)"
+            transform: "scale(0.9)"
         }
     },
 };
