@@ -5,13 +5,21 @@
  */
 
 /* Existing changelog styles */
+
 .vc-changelog-entry {
     padding: 0.75em;
     margin-bottom: 0.5em;
     background-color: var(--background-base-lower-alt);
     border-radius: 8px;
-    transition: 0.1s ease-out;
-    transition-property: box-shadow, transform, background, opacity;
+
+    transition:
+        box-shadow 0.1s ease-out,
+        transform 0.1s ease-out,
+        background 0.1s ease-out,
+        opacity 0.1s ease-out;
+
+    will-change: transform;
+    overflow: hidden;
 }
 
 .vc-changelog-entry:hover {
@@ -36,12 +44,16 @@
     align-items: center;
     gap: 0.5em;
     margin-bottom: 0.25em;
+
+    flex-wrap: wrap;
 }
 
 .vc-changelog-entry-hash {
     font-size: 0.875em;
     font-family: var(--font-code);
     color: var(--text-subtle);
+
+    word-break: break-word;
 }
 
 .vc-changelog-entry-author {
@@ -54,6 +66,8 @@
     color: var(--text-default);
     font-size: 0.95em;
     line-height: 1.4;
+
+    word-break: break-word;
 }
 
 .vc-changelog-entry.required .vc-changelog-entry-hash {
@@ -73,6 +87,8 @@
     background-color: var(--background-base-lower-alt);
     border-radius: 8px;
     color: var(--text-subtle);
+
+    overflow: hidden;
 }
 
 .vc-changelog-controls {
@@ -87,6 +103,8 @@
     align-items: center;
     gap: 0.5em;
     margin-bottom: 1em;
+
+    flex-wrap: wrap;
 }
 
 .vc-changelog-current-hash {
@@ -98,17 +116,22 @@
 }
 
 /* New Plugins Section Styles */
+
 .vc-changelog-new-plugins-section {
     margin-bottom: 1.5em;
     padding: 1em;
     background-color: var(--background-base-lower-alt);
     border-radius: 8px;
     border-left: 4px solid var(--brand);
+
+    overflow: hidden;
 }
 
 .vc-changelog-new-plugins-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+
     gap: 0.75em;
 }
 
@@ -116,7 +139,14 @@
     background-color: var(--background-base-low);
     border-radius: 6px;
     padding: 0.5em;
-    transition: all 0.1s ease-out;
+
+    transition:
+        background-color 0.1s ease-out,
+        transform 0.1s ease-out,
+        box-shadow 0.1s ease-out;
+
+    will-change: transform;
+    overflow: hidden;
 }
 
 .vc-changelog-new-plugin-card:hover {
@@ -128,6 +158,8 @@
 .vc-changelog-new-plugin-card.required {
     border-left: 4px solid var(--status-warning);
     background-color: var(--background-base-lower-alt);
+
+    padding-left: calc(0.5em - 4px);
 }
 
 .vc-changelog-new-plugin-card.required:hover {
@@ -139,6 +171,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
+
     margin-bottom: 0;
     padding-top: 0;
 }
@@ -152,14 +185,23 @@
 .vc-changelog-new-plugin-tag {
     display: inline-flex;
     align-items: center;
+
     padding: 0.25em 0.5em;
+
     background-color: var(--brand);
     color: var(--white);
+
     border-radius: 4px;
+
     font-size: 0.875em;
     font-weight: 500;
+
     text-decoration: none;
+
     transition: background-color 0.1s ease;
+
+    max-width: 100%;
+    word-break: break-word;
 }
 
 .vc-changelog-new-plugin-tag:hover {
@@ -174,6 +216,7 @@
 .vc-changelog-new-plugin-tag.required {
     background-color: var(--status-warning);
     color: var(--white);
+
     border: 1px solid var(--status-warning-background);
 }
 
@@ -184,12 +227,17 @@
 .vc-changelog-restart-notice {
     margin-top: 1em;
     padding: 0.75em;
+
     background-color: var(--background-feedback-warning);
+
     border-radius: 6px;
     border-left: 4px solid var(--status-warning);
+
+    overflow: hidden;
 }
 
 /* Update Logs Styles */
+
 .vc-changelog-history {
     margin-top: 1.5em;
 }
@@ -198,17 +246,26 @@
     display: flex;
     flex-direction: column;
     gap: 0.75em;
+
     padding-right: 0.5em;
+
     min-height: auto !important;
     max-height: none !important;
     height: auto !important;
+
+    overflow: visible !important;
 }
 
 .vc-changelog-log {
     background-color: var(--background-base-lower-alt);
+
     border-radius: 8px;
+
     overflow: hidden;
-    transition: all 0.1s ease-out;
+
+    transition:
+        box-shadow 0.1s ease-out,
+        background-color 0.1s ease-out;
 }
 
 .vc-changelog-log:hover {
@@ -219,12 +276,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     padding: 1em;
+
     cursor: pointer;
+
     transition: background-color 0.1s ease;
+
     user-select: none;
+
     gap: 0.5em;
+
     position: relative;
+
+    overflow: hidden;
 }
 
 .vc-changelog-log-header:hover {
@@ -233,30 +298,47 @@
 
 .vc-changelog-log-info {
     flex: 1;
+
+    min-width: 0;
 }
 
 .vc-changelog-log-title {
     font-weight: 600;
     font-size: 0.95em;
+
     color: var(--text-default);
+
     margin-bottom: 0.25em;
+
     font-family: var(--font-code);
+
     display: flex;
     align-items: center;
     gap: 8px;
+
     flex: 1;
+
+    flex-wrap: wrap;
+
+    word-break: break-word;
 }
 
 .vc-changelog-log-meta {
     font-size: 0.875em;
     color: var(--text-subtle);
+
     line-height: 1.3;
+
+    word-break: break-word;
 }
 
 .vc-changelog-log-toggle {
     transition: transform 0.2s ease;
+
     color: var(--text-subtle);
+
     font-size: 0.75em;
+
     flex-shrink: 0;
 }
 
@@ -266,77 +348,41 @@
 
 .vc-changelog-log-content {
     padding: 0 1em 1em;
+
     border-top: 1px solid var(--background-base-lowest);
+
     animation: expand-content 0.2s ease-out;
 
-    /* allow content to expand naturally (fixes cramming of elements) */
     min-height: auto !important;
     max-height: none !important;
+
     overflow: visible !important;
 }
 
-.vc-changelog-log-plugins {
-    margin-bottom: 1em;
-    padding-top: 0.75em;
-}
-
-.vc-changelog-log-plugins:last-child {
-    margin-bottom: 0;
-}
-
+.vc-changelog-log-plugins,
 .vc-changelog-log-commits {
     margin-bottom: 1em;
     padding-top: 0.75em;
 }
 
+.vc-changelog-log-plugins:last-child,
 .vc-changelog-log-commits:last-child {
     margin-bottom: 0;
 }
 
-.vc-changelog-log-commits-list {
+.vc-changelog-log-commits-list,
+.vc-changelog-plugins-list,
+.vc-changelog-commits-list {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+
     padding-right: 0.5em;
     padding-top: 0;
+
+    overflow: visible;
 }
 
-/* fix plugin entry padding to match commit entries (this took 3 different tries bro) */
-.vc-changelog-plugins-list .vc-changelog-entry {
-    padding: 0.75em;
-    margin-bottom: 0.5em;
-}
-
-/* Visual refresh support */
-.visual-refresh .vc-changelog-entry {
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--border-subtle);
-}
-
-.vc-changelog-log-commits-list .vc-changelog-entry:last-child {
-    margin-bottom: 0;
-}
-
-.vc-changelog-plugins-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    padding-right: 0.5em;
-    padding-top: 0;
-}
-
-.visual-refresh .vc-changelog-entry.required {
-    border-left: 4px solid var(--status-warning);
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--border-subtle);
-    padding-left: calc(0.75em - 4px);
-}
-
-.vc-changelog-plugins-list .vc-changelog-entry:last-child {
-    margin-bottom: 0;
-}
-
-/* consistent padding for required plugin entries in logs */
 .vc-changelog-plugins-list .vc-changelog-entry.required {
     padding-left: calc(0.75em - 4px);
     margin-bottom: 0.5em;
@@ -346,105 +392,36 @@
     margin-bottom: 0;
 }
 
-.vc-changelog-log-commits-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.vc-changelog-log-commits-list::-webkit-scrollbar-track {
-    background: var(--background-base-lower-alt);
-    border-radius: 3px;
-}
-
-.vc-changelog-log-commits-list::-webkit-scrollbar-thumb {
-    background: var(--text-subtle);
-    border-radius: 3px;
-}
-
-.vc-changelog-log-commits-list::-webkit-scrollbar-thumb:hover {
-    background: var(--text-default);
-}
-
-/* Current changes section */
-.vc-changelog-current {
-    margin-bottom: 1.5em;
-}
-
-.vc-changelog-commits-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-}
-
-/* Scrollbar styling for history list and log content */
+.vc-changelog-log-commits-list::-webkit-scrollbar,
 .vc-changelog-history-list::-webkit-scrollbar,
 .vc-changelog-log-content::-webkit-scrollbar {
     width: 6px;
 }
 
+.vc-changelog-log-commits-list::-webkit-scrollbar-track,
 .vc-changelog-history-list::-webkit-scrollbar-track,
 .vc-changelog-log-content::-webkit-scrollbar-track {
     background: var(--background-base-lower-alt);
     border-radius: 3px;
 }
 
+.vc-changelog-log-commits-list::-webkit-scrollbar-thumb,
 .vc-changelog-history-list::-webkit-scrollbar-thumb,
 .vc-changelog-log-content::-webkit-scrollbar-thumb {
     background: var(--text-subtle);
     border-radius: 3px;
 }
 
+.vc-changelog-log-commits-list::-webkit-scrollbar-thumb:hover,
 .vc-changelog-history-list::-webkit-scrollbar-thumb:hover,
 .vc-changelog-log-content::-webkit-scrollbar-thumb:hover {
     background: var(--text-default);
 }
 
-.visual-refresh .vc-changelog-entry:hover {
-    background-color: var(--background-surface-high);
-    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
-}
+/* Responsive */
 
-.visual-refresh .vc-changelog-empty {
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--border-subtle);
-}
-
-.visual-refresh .vc-changelog-current-hash {
-    background-color: var(--input-background);
-    border: 1px solid var(--border-subtle);
-}
-
-.visual-refresh .vc-changelog-new-plugins-section {
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--border-subtle);
-    border-left: 4px solid var(--brand);
-}
-
-.visual-refresh .vc-changelog-new-plugin-card {
-    background-color: var(--card-secondary-bg);
-    border: 1px solid var(--border-subtle);
-}
-
-.visual-refresh .vc-changelog-log {
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--border-subtle);
-}
-
-.visual-refresh .vc-changelog-log-header:hover {
-    background-color: var(--card-secondary-bg);
-}
-
-.visual-refresh .vc-changelog-log-content {
-    border-top: 1px solid var(--border-subtle);
-}
-
-.visual-refresh .vc-changelog-restart-notice {
-    background-color: var(--background-surface-high);
-    border: 1px solid var(--status-warning);
-    border-left: 4px solid var(--status-warning);
-}
-
-/* Responsive design */
 @media (width <=768px) {
+
     .vc-changelog-new-plugins-grid {
         grid-template-columns: 1fr;
     }
@@ -454,15 +431,9 @@
         align-items: stretch;
     }
 
-    .vc-changelog-session-header {
+    .vc-changelog-log-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5em;
-    }
-
-    .vc-changelog-log-toggle {
-        align-self: flex-end;
-        margin-top: -1.5em;
     }
 
     .vc-changelog-log-title {
@@ -470,14 +441,25 @@
         gap: 4px;
     }
 
+    .vc-changelog-log-toggle {
+        align-self: flex-end;
+        margin-top: -1.5em;
+    }
+
     .vc-changelog-delete-button {
         order: 1;
     }
+
+    .vc-changelog-entry,
+    .vc-changelog-log,
+    .vc-changelog-new-plugin-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
-/* Animation for expanding/collapsing logs */
-
 @keyframes expand-content {
+
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -489,16 +471,22 @@
     }
 }
 
-/* Badge styles for plugin counts */
+/* Badges */
+
 .vc-changelog-badge {
     display: inline-flex;
     align-items: center;
+
     padding: 0.125em 0.375em;
+
     background-color: var(--brand);
     color: var(--white);
+
     border-radius: 12px;
+
     font-size: 0.75em;
     font-weight: 600;
+
     margin-left: 0.5em;
 }
 
@@ -510,53 +498,28 @@
     background-color: var(--status-positive);
 }
 
-/* Required plugin styling */
 .vc-changelog-dep-text {
     font-size: 0.875em;
     color: var(--text-subtle);
+
     margin-left: 1em;
+
     font-style: italic;
+
+    word-break: break-word;
 }
 
-/* Visual refresh support for required plugins */
-.visual-refresh .vc-changelog-new-plugin-tag.required {
-    background-color: var(--status-warning);
-    border: 1px solid var(--status-warning-background);
-}
+/* Trash button */
 
-.visual-refresh .vc-changelog-new-plugin-card.required {
-    border-left: 4px solid var(--status-warning);
-    background-color: var(--card-secondary-bg);
-}
-
-/* Global overrides for changelog in settings modal */
-.vc-settings-tab [class*="changelog"] {
-    min-height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-}
-
-/* Ensure Forms.FormSection doesn't constrain changelog */
-.vc-settings-tab .vc-changelog-history,
-.vc-settings-tab .vc-changelog-history-list,
-.vc-settings-tab .vc-changelog-log-content {
-    min-height: auto !important;
-    max-height: none !important;
-    height: auto !important;
-    overflow: visible !important;
-}
-
-.visual-refresh .vc-changelog-entry.required:hover {
-    background-color: var(--card-secondary-bg);
-}
-
-/* Trash icon styling */
 .vc-changelog-delete-button {
+
     transition:
         opacity 0.2s ease,
         color 0.2s ease,
         background-color 0.2s ease;
+
     border-radius: 4px;
+
     flex-shrink: 0;
 }
 
@@ -566,6 +529,7 @@
     background-color: var(--background-mod-subtle);
 }
 
-.vc-changelog-log-header:hover .vc-changelog-delete-button {
+.vc-changelog-log-header:hover
+.vc-changelog-delete-button {
     opacity: 0.8;
 }
