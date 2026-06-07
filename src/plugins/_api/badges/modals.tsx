@@ -403,7 +403,11 @@ export function MaceSafeModal() {
                             margin: 0
                         }}
                     >
-                        <Flex justifyContent="center" alignItems="center" gap="0.5em">
+                        <Flex
+                            justifyContent="center"
+                            alignItems="center"
+                            gap="0.5em"
+                        >
                             <Heart />
                             Mace Safe
                         </Flex>
@@ -427,7 +431,15 @@ export function MaceSafeModal() {
 
                     <div style={{ padding: "1em" }}>
                         <Paragraph>
-                            Official Mace Safe badge.
+                            This is a custom MallCord badge.
+                            <br />
+                            <br />
+                            If you want your own custom badge, message:
+                            <br />
+                            sonnyasd on Discord
+                            <br />
+                            <br />
+                            Custom badges are paid only — price/details will be discussed in DM.
                         </Paragraph>
                     </div>
                 </div>
