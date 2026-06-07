@@ -6,36 +6,23 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-// @ts-check
 
 import "../suppressExperimentalWarnings.js";
 import "../checkNodeVersion.js";
 
-import { exec, execSync } from "child_process";
 import esbuild, { build, context } from "esbuild";
 import { constants as FsConstants, readFileSync } from "fs";
 import { access, readdir, readFile } from "fs/promises";
 import { minify as minifyHtml } from "html-minifier-terser";
 import { dirname, join, relative, resolve } from "path";
 import { fileURLToPath } from "url";
-import { promisify } from "util";
 
 import { getPluginTarget } from "../utils.mjs";
 
 const PackageJSON = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../package.json"), "utf-8"));
 
 export const VERSION = PackageJSON.version;
-// https://reproducible-builds.org/docs/source-date-epoch/
 export const BUILD_TIMESTAMP = Number(process.env.SOURCE_DATE_EPOCH) * 1000 || Date.now();
 
 export const watch = process.argv.includes("--watch");
@@ -44,6 +31,7 @@ export const IS_REPORTER = process.argv.includes("--reporter");
 export const IS_ANTI_CRASH_TEST = process.argv.includes("--anti-crash-test");
 export const IS_STANDALONE = process.argv.includes("--standalone");
 export const IS_COMPANION_TEST = IS_REPORTER && process.argv.includes("--companion-test");
+
 if (!IS_COMPANION_TEST && process.argv.includes("--companion-test"))
     console.error("--companion-test must be run with --reporter for any effect");
 
@@ -59,10 +47,6 @@ export const banner = {
 `.trim()
 };
 
-/**
- * JSON.stringify all values in an object
- * @type {(obj: Record<string, any>) => Record<string, string>}
- */
 export function stringifyValues(obj) {
     for (const key in obj) {
         obj[key] = JSON.stringify(obj[key]);
@@ -70,9 +54,6 @@ export function stringifyValues(obj) {
     return obj;
 }
 
-/**
- * @param {import("esbuild").BuildOptions[]} buildConfigs
- */
 export async function buildOrWatchAll(buildConfigs) {
     if (watch) {
         await Promise.all(buildConfigs.map(cfg =>
@@ -89,10 +70,7 @@ export async function buildOrWatchAll(buildConfigs) {
 }
 
 const PluginDefinitionNameMatcher = /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
-/**
- * @param {string} base
- * @param {import("fs").Dirent} dirent
- */
+
 export async function resolvePluginName(base, dirent) {
     const fullPath = join(base, dirent.name);
     const content = dirent.isFile()
@@ -120,10 +98,6 @@ export async function exists(path) {
         .catch(() => false);
 }
 
-// https://github.com/evanw/esbuild/issues/619#issuecomment-751995294
-/**
- * @type {import("esbuild").Plugin}
- */
 export const makeAllPackagesExternalPlugin = {
     name: "make-all-packages-external",
     setup(build) {
@@ -132,19 +106,14 @@ export const makeAllPackagesExternalPlugin = {
     }
 };
 
-/**
- * @type {(kind: "web" | "discordDesktop" | "vesktop" | "equibop") => import("esbuild").Plugin}
- */
 export const globPlugins = kind => ({
     name: "glob-plugins",
     setup: build => {
         const filter = /^~plugins$/;
-        build.onResolve({ filter }, args => {
-            return {
-                namespace: "import-plugins",
-                path: args.path
-            };
-        });
+        build.onResolve({ filter }, args => ({
+            namespace: "import-plugins",
+            path: args.path
+        }));
 
         build.onLoad({ filter, namespace: "import-plugins" }, async () => {
             const pluginDirs = ["plugins/_api", "plugins/_core", "plugins", "mallcordplugins/_api", "mallcordplugins/_core", "mallcordplugins", "userplugins"];
@@ -156,8 +125,8 @@ export const globPlugins = kind => ({
 
             for (const dir of pluginDirs) {
                 const userPlugin = dir === "userplugins";
-
                 const fullDir = `./src/${dir}`;
+
                 if (!await exists(fullDir)) continue;
 
                 const files = await readdir(fullDir, { withFileTypes: true });
@@ -188,8 +157,8 @@ export const globPlugins = kind => ({
                     }
 
                     const folderName = `src/${dir}/${fileName}`;
-
                     const mod = `p${i}`;
+
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
                     pluginsCode += `[${mod}.name]:${mod},\n`;
                     metaCode += `[${mod}.name]:${JSON.stringify({ folderName, userPlugin })},\n`;
@@ -208,9 +177,6 @@ export const globPlugins = kind => ({
     }
 });
 
-/**
- * @type {import("esbuild").Plugin}
- */
 export const gitHashPlugin = {
     name: "git-hash-plugin",
     setup: build => {
@@ -224,9 +190,6 @@ export const gitHashPlugin = {
     }
 };
 
-/**
- * @type {import("esbuild").Plugin}
- */
 export const gitRemotePlugin = {
     name: "git-remote-plugin",
     setup: build => {
@@ -238,7 +201,7 @@ export const gitRemotePlugin = {
             let remote = process.env.MALLCORD_REMOTE;
 
             if (!remote) {
-                remote = "MallCord/MallCord";
+                remote = "Sonnyasd/MallCord";
             }
 
             return { contents: `export default "${remote}"` };
@@ -246,9 +209,6 @@ export const gitRemotePlugin = {
     }
 };
 
-/**
- * @type {import("esbuild").Plugin}
- */
 export const fileUrlPlugin = {
     name: "file-uri-plugin",
     setup: build => {
@@ -311,17 +271,14 @@ export const fileUrlPlugin = {
 export const banImportPlugin = (filter, message) => ({
     name: "ban-imports",
     setup: build => {
-        build.onResolve({ filter }, () => {
-            return { errors: [{ text: message }] };
-        });
+        build.onResolve({ filter }, () => ({
+            errors: [{ text: message }]
+        }));
     }
 });
 
 const styleModule = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "module/style.js"), "utf-8");
 
-/**
- * @type {import("esbuild").Plugin}
- */
 export const stylePlugin = {
     name: "style-plugin",
     setup: ({ onResolve, onLoad }) => {
@@ -344,9 +301,6 @@ export const stylePlugin = {
     }
 };
 
-/**
- * @type {import("esbuild").BuildOptions}
- */
 export const commonOpts = {
     logLevel: "info",
     bundle: true,
