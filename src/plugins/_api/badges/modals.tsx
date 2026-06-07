@@ -210,7 +210,7 @@ export function MallCordFounderModal() {
                     <Flex>
                         <img
                             role="presentation"
-                            src="https://iili.io/CfaXwt2.png"
+                            src="https://iili.io/C3jZGrg.th.png"
                             alt=""
                             style={{
                                 margin: "auto",
@@ -312,7 +312,7 @@ export function MallCordDevModal() {
                     <Flex>
                         <img
                             role="presentation"
-                            src="https://iili.io/CfaMp94.png"
+                            src="https://iili.io/C3jZGrg.th.png"
                             alt=""
                             style={{
                                 margin: "auto",
