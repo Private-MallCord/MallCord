@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 :: MallCord installer / uninstaller
 :: Run as a normal user (NOT as Administrator).
 
-set REPO_URL=https://github.com/MallCord/MallCord
+set REPO_URL=https://github.com/Sonnyasd/MallCord
 set INSTALL_DIR=%USERPROFILE%\MallCord
 
 echo.
