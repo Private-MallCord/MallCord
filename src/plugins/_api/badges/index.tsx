@@ -108,18 +108,35 @@ const MallCordContributorBadge: ProfileBadge = {
     },
 };
 
-const MallCordDonorBadge: ProfileBadge = {
+const MallCordSupporterBadge: ProfileBadge = {
     id: "mallcord_supporter_badge",
     description: "MallCord Supporter",
     iconSrc: DONOR_BADGE,
     position: BadgePosition.START,
 
     shouldShow: ({ userId }) =>
-        MALLCORD_SUPPORTER_IDS.has(userId) ||
-        (MallCordDonorBadges[userId]?.some(badge =>
-            badge.tooltip === "MallCord Donor" ||
-            badge.tooltip === "MallCord Supporter"
-        ) ?? false),
+        MALLCORD_SUPPORTER_IDS.has(userId),
+
+    onClick: () => MallCordDonorModal(),
+
+    props: {
+        style: {
+            borderRadius: "50%",
+            transform: "scale(0.9)"
+        }
+    },
+};
+
+const MallCordDonorBadge: ProfileBadge = {
+    id: "mallcord_donor_badge",
+    description: "MallCord Donor",
+    iconSrc: DONOR_BADGE,
+    position: BadgePosition.START,
+
+    shouldShow: ({ userId }) =>
+        MallCordDonorBadges[userId]?.some(
+            badge => badge.tooltip === "MallCord Donor"
+        ) ?? false,
 
     onClick: () => MallCordDonorModal(),
 
@@ -287,6 +304,7 @@ export default definePlugin({
         MallCordFounderBadge,
         MallCordDevBadge,
         MallCordContributorBadge,
+        MallCordSupporterBadge,
         MallCordDonorBadge,
         MallCordFriendBadge,
         UserPluginContributorBadge
