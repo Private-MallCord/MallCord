@@ -27,6 +27,8 @@ import {
     MallCordDevModal,
     MallCordDonorModal,
     MallCordFounderModal,
+    MallCordFriendModal,
+    MaceSafeModal,
     VencordDonorModal
 } from "./modals";
 
@@ -197,6 +199,8 @@ const MallCordFriendBadge: ProfileBadge = {
         userId === "1345836898106736790" ||
         userId === "1385182510396477557",
 
+    onClick: () => MallCordFriendModal(),
+
     props: {
         style: {
             borderRadius: "50%",
@@ -213,6 +217,8 @@ const MaceSafeBadge: ProfileBadge = {
 
     shouldShow: ({ userId }) =>
         userId === "1431018556639936673",
+
+    onClick: () => MaceSafeModal(),
 
     props: {
         style: {
