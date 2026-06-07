@@ -3,7 +3,7 @@
 # Usage: bash install.sh
 set -euo pipefail
 
-REPO_URL="https://github.com/MallCord/MallCord"
+REPO_URL="https://github.com/Sonnyasd/MallCord"
 INSTALL_DIR="$HOME/MallCord"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
