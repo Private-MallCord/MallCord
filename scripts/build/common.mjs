@@ -48,7 +48,7 @@ if (!IS_COMPANION_TEST && process.argv.includes("--companion-test"))
     console.error("--companion-test must be run with --reporter for any effect");
 
 export const IS_UPDATER_DISABLED = process.argv.includes("--disable-updater");
-export const gitHash = process.env.MALLCORD_HASH || "unkown";
+export const gitHash = process.env.MALLCORD_HASH || "BETA";
 
 export const banner = {
     js: `
