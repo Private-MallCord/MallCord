@@ -29,8 +29,14 @@ export function NewPluginsSection({
     newPlugins,
     onPluginToggle,
 }: NewPluginsSectionProps) {
+
     const settings = useSettings();
-    const changes = React.useMemo(() => new ChangeList<string>(), []);
+
+    const changes = React.useMemo(
+        () => new ChangeList<string>(),
+        [],
+    );
+
     const forceUpdate = useForceUpdater();
 
     const depMap = React.useMemo(() => {
@@ -66,7 +72,9 @@ export function NewPluginsSection({
     }
 
     const makeDependencyList = (deps?: string[]) => {
-        if (!deps?.length) return null;
+        if (!deps?.length) {
+            return null;
+        }
 
         return (
             <React.Fragment>
@@ -88,6 +96,7 @@ export function NewPluginsSection({
 
     return (
         <div className={cl("new-plugins-section")}>
+
             <Heading className={Margins.bottom8}>
                 New Plugins ({sortedPlugins.length})
             </Heading>
@@ -97,6 +106,7 @@ export function NewPluginsSection({
             </Paragraph>
 
             <div className={cl("new-plugins-grid")}>
+
                 {sortedPlugins.map(plugin => {
 
                     const enabledDeps =
@@ -121,7 +131,7 @@ export function NewPluginsSection({
                             >
                                 {({
                                     onMouseLeave,
-                                    onMouseEnter
+                                    onMouseEnter,
                                 }) => (
                                     <Card
                                         className={cl(
@@ -163,10 +173,12 @@ export function NewPluginsSection({
                         </Card>
                     );
                 })}
+
             </div>
 
             {changes.hasChanges && (
                 <div className={cl("restart-notice")}>
+
                     <Tooltip
                         text={
                             <>
@@ -176,7 +188,9 @@ export function NewPluginsSection({
 
                                 <ul>
                                     {changes.map(p => (
-                                        <li key={p}>{p}</li>
+                                        <li key={p}>
+                                            {p}
+                                        </li>
                                     ))}
                                 </ul>
                             </>
@@ -194,8 +208,10 @@ export function NewPluginsSection({
                             </Button>
                         )}
                     </Tooltip>
+
                 </div>
             )}
+
         </div>
     );
 }
@@ -242,7 +258,9 @@ function CompactPluginCard({
                 isRequired ? "required" : ""
             }`}
         >
+
             <div className="vc-changelog-entry-header">
+
                 <span className="vc-changelog-entry-hash">
                     {plugin.name}
                     {isRequired && " *"}
@@ -251,6 +269,7 @@ function CompactPluginCard({
                 <span className="vc-changelog-entry-author">
                     {plugin.authors?.[0]?.name || "Unknown"}
                 </span>
+
             </div>
 
             <div className="vc-changelog-entry-message">
@@ -262,6 +281,7 @@ function CompactPluginCard({
                     {tooltipText}
                 </div>
             )}
+
         </div>
     );
 }
@@ -274,9 +294,11 @@ export function NewPluginsCompact({
     const settings = useSettings();
 
     const depMap = React.useMemo(() => {
+
         const o = {} as Record<string, string[]>;
 
         for (const plugin in Plugins) {
+
             const deps = Plugins[plugin]?.dependencies;
 
             if (deps) {
@@ -288,6 +310,7 @@ export function NewPluginsCompact({
         }
 
         return o;
+
     }, []);
 
     if (newPlugins.length === 0) {
@@ -302,6 +325,7 @@ export function NewPluginsCompact({
 
     return (
         <div className={cl("new-plugins-compact")}>
+
             <div className="vc-changelog-plugins-list">
 
                 {displayPlugins.map(pluginName => (
@@ -315,13 +339,16 @@ export function NewPluginsCompact({
 
                 {hasMore && (
                     <div className="vc-changelog-entry">
+
                         <div className="vc-changelog-entry-message">
                             +{newPlugins.length - maxDisplay} more plugins
                         </div>
+
                     </div>
                 )}
 
             </div>
+
         </div>
     );
 }
