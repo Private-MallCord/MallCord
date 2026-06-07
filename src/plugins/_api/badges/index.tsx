@@ -285,6 +285,53 @@ export default definePlugin({
     authors: [Devs.Megu, Devs.Ven, Devs.TheSun],
     required: true,
 
+    patches: [
+        {
+            find: "#{intl::PROFILE_USER_BADGES}",
+            replacement: [
+                {
+                    match: /alt:" ","aria-hidden":!0,src:.{0,50}(\i).iconSrc/,
+                    replace: "...$1.props,$&"
+                },
+                {
+                    match: /(?<=forceOpen:.{0,40}?ariaHidden:!0,)children:(?=.{0,50}?(\i)\.id)/,
+                    replace: "children:$1.component?$self.renderBadgeComponent({...$1}) :"
+                },
+                {
+                    match: /href:(\i)\.link/,
+                    replace: "...$self.getBadgeMouseEventHandlers($1),$&"
+                }
+            ]
+        },
+        {
+            find: "getLegacyUsername(){",
+            replacement: {
+                match: /getBadges\(\)\{.{0,100}?return\[/,
+                replace: "$&...$self.getBadges(this),"
+            }
+        }
+    ],
+
+    get DonorBadges() {
+        return DonorBadges;
+    },
+
+    get MallCordDonorBadges() {
+        return MallCordDonorBadges;
+    },
+
+    toolboxActions: {
+        async "Refetch Badges"() {
+            await loadAllBadges(true);
+
+            Toasts.show({
+                id: Toasts.genId(),
+                message: "Successfully refetched badges!",
+                type: Toasts.Type.SUCCESS
+            });
+        }
+    },
+
     userProfileBadges: [
         MallCordFounderBadge,
         MallCordDevBadge,
