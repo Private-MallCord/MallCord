@@ -386,3 +386,52 @@ export function MallCordFriendModal() {
         </ErrorBoundary>
     ));
 }
+
+export function MaceSafeModal() {
+    openModal(props => (
+        <ErrorBoundary noop onError={() => {
+            props.onClose();
+        }}>
+            <Modal
+                {...props}
+                title={
+                    <Heading
+                        tag="h2"
+                        style={{
+                            width: "100%",
+                            textAlign: "center",
+                            margin: 0
+                        }}
+                    >
+                        <Flex justifyContent="center" alignItems="center" gap="0.5em">
+                            <Heart />
+                            Mace Safe
+                        </Flex>
+                    </Heading>
+                }
+            >
+                <div>
+                    <Flex>
+                        <img
+                            role="presentation"
+                            src="https://iili.io/CfDblEJ.th.gif"
+                            alt=""
+                            style={{
+                                margin: "auto",
+                                width: "96px",
+                                height: "96px",
+                                borderRadius: "50%"
+                            }}
+                        />
+                    </Flex>
+
+                    <div style={{ padding: "1em" }}>
+                        <Paragraph>
+                            Official Mace Safe badge.
+                        </Paragraph>
+                    </div>
+                </div>
+            </Modal>
+        </ErrorBoundary>
+    ));
+}
