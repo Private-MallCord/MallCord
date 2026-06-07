@@ -11,6 +11,7 @@
 import "../suppressExperimentalWarnings.js";
 import "../checkNodeVersion.js";
 
+import { execSync } from "child_process";
 import esbuild, { build, context } from "esbuild";
 import { constants as FsConstants, readFileSync } from "fs";
 import { access, readdir, readFile } from "fs/promises";
@@ -36,7 +37,16 @@ if (!IS_COMPANION_TEST && process.argv.includes("--companion-test"))
     console.error("--companion-test must be run with --reporter for any effect");
 
 export const IS_UPDATER_DISABLED = process.argv.includes("--disable-updater");
-export const gitHash = process.env.MALLCORD_HASH || "1gh4uu53f";
+
+export const gitHash = (() => {
+    try {
+        return execSync("git rev-parse HEAD", {
+            encoding: "utf-8"
+        }).trim();
+    } catch {
+        return process.env.MALLCORD_HASH || "unknown";
+    }
+})();
 
 export const banner = {
     js: `
