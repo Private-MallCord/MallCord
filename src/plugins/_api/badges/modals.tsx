@@ -365,7 +365,7 @@ export function MallCordFriendModal() {
                     <Flex>
                         <img
                             role="presentation"
-                            src="https://iili.io/CfaXjwl.gif"
+                            src="https://iili.io/CqJFxlR.jpg"
                             alt=""
                             style={{
                                 margin: "auto",
