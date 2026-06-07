@@ -36,7 +36,7 @@ const MALLCORD_CONTRIBUTOR_BADGE = "https://iili.io/Cfmxofj.png";
 const USERPLUGIN_CONTRIBUTOR_BADGE = "https://iili.io/C3jZGrg.th.png";
 const MALLCORD_DEV_BADGE = "https://iili.io/CfaMp94.png";
 const FOUNDER_BADGE = "https://iili.io/CfaXwt2.png";
-const FRIEND_BADGE = "https://iili.io/CfaXjwl.gif";
+const FRIEND_BADGE = "https://iili.io/CqJFxlR.jpg";
 const DONOR_BADGE = "https://iili.io/CfG9TKb.gif";
 const MACESAFE_BADGE = "https://iili.io/CfDblEJ.th.gif";
 
