@@ -117,7 +117,11 @@ const MallCordSupporterBadge: ProfileBadge = {
     shouldShow: ({ userId }) =>
         MALLCORD_SUPPORTER_IDS.has(userId),
 
-    onClick: () => MallCordDonorModal(),
+    onClick: () => {
+        VencordNative.native.openExternal(
+            "https://ko-fi.com/privatemallcord"
+        );
+    },
 
     props: {
         style: {
@@ -138,7 +142,11 @@ const MallCordDonorBadge: ProfileBadge = {
             badge => badge.tooltip === "MallCord Donor"
         ) ?? false,
 
-    onClick: () => MallCordDonorModal(),
+    onClick: () => {
+        VencordNative.native.openExternal(
+            "https://ko-fi.com/privatemallcord"
+        );
+    },
 
     props: {
         style: {
@@ -417,7 +425,9 @@ export default definePlugin({
             },
 
             onClick() {
-                return MallCordDonorModal();
+                VencordNative.native.openExternal(
+                    "https://ko-fi.com/privatemallcord"
+                );
             },
         } satisfies ProfileBadge));
     }
