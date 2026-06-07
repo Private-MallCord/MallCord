@@ -36,6 +36,7 @@ const MALLCORD_DEV_BADGE = "https://iili.io/CfaMp94.png";
 const FOUNDER_BADGE = "https://iili.io/CfaXwt2.png";
 const FRIEND_BADGE = "https://iili.io/CfaXjwl.gif";
 const DONOR_BADGE = "https://iili.io/CfG9TKb.gif";
+const MACESAFE_BADGE = "https://iili.io/CfDblEJ.th.gif";
 
 const MALLCORD_SUPPORTER_IDS = new Set<string>([
     "1469765555480297723"
@@ -99,6 +100,36 @@ const MallCordContributorBadge: ProfileBadge = {
         shouldShowMallCordContributorBadge(userId),
 
     onClick: () => MallCordContributorModal(),
+
+    props: {
+        style: {
+            borderRadius: "50%",
+            transform: "scale(0.9)"
+        }
+    },
+};
+
+const UserPluginContributorBadge: ProfileBadge = {
+    id: "user_plugin_contributor_badge",
+    description: "User Plugin Contributor",
+    iconSrc: USERPLUGIN_CONTRIBUTOR_BADGE,
+    position: BadgePosition.START,
+
+    shouldShow: ({ userId }) => {
+        if (!IS_DEV) return false;
+
+        const allPlugins = Object.values(Plugins);
+
+        return allPlugins.some(p => {
+            const pluginMeta = PluginMeta[p.name];
+
+            return pluginMeta?.userPlugin &&
+                p.authors.some(a => a.id.toString() === userId);
+        });
+    },
+
+    onClick: (_, { userId }) =>
+        openContributorModal(UserStore.getUser(userId)),
 
     props: {
         style: {
@@ -174,27 +205,14 @@ const MallCordFriendBadge: ProfileBadge = {
     },
 };
 
-const UserPluginContributorBadge: ProfileBadge = {
-    id: "user_plugin_contributor_badge",
-    description: "User Plugin Contributor",
-    iconSrc: USERPLUGIN_CONTRIBUTOR_BADGE,
+const MaceSafeBadge: ProfileBadge = {
+    id: "macesafe_badge",
+    description: "Mace Safe",
+    iconSrc: MACESAFE_BADGE,
     position: BadgePosition.START,
 
-    shouldShow: ({ userId }) => {
-        if (!IS_DEV) return false;
-
-        const allPlugins = Object.values(Plugins);
-
-        return allPlugins.some(p => {
-            const pluginMeta = PluginMeta[p.name];
-
-            return pluginMeta?.userPlugin &&
-                p.authors.some(a => a.id.toString() === userId);
-        });
-    },
-
-    onClick: (_, { userId }) =>
-        openContributorModal(UserStore.getUser(userId)),
+    shouldShow: ({ userId }) =>
+        userId === "1431018556639936673",
 
     props: {
         style: {
@@ -261,61 +279,15 @@ export default definePlugin({
     authors: [Devs.Megu, Devs.Ven, Devs.TheSun],
     required: true,
 
-    patches: [
-        {
-            find: "#{intl::PROFILE_USER_BADGES}",
-            replacement: [
-                {
-                    match: /alt:" ","aria-hidden":!0,src:.{0,50}(\i).iconSrc/,
-                    replace: "...$1.props,$&"
-                },
-                {
-                    match: /(?<=forceOpen:.{0,40}?ariaHidden:!0,)children:(?=.{0,50}?(\i)\.id)/,
-                    replace: "children:$1.component?$self.renderBadgeComponent({...$1}) :"
-                },
-                {
-                    match: /href:(\i)\.link/,
-                    replace: "...$self.getBadgeMouseEventHandlers($1),$&"
-                }
-            ]
-        },
-        {
-            find: "getLegacyUsername(){",
-            replacement: {
-                match: /getBadges\(\)\{.{0,100}?return\[/,
-                replace: "$&...$self.getBadges(this),"
-            }
-        }
-    ],
-
-    get DonorBadges() {
-        return DonorBadges;
-    },
-
-    get MallCordDonorBadges() {
-        return MallCordDonorBadges;
-    },
-
-    toolboxActions: {
-        async "Refetch Badges"() {
-            await loadAllBadges(true);
-
-            Toasts.show({
-                id: Toasts.genId(),
-                message: "Successfully refetched badges!",
-                type: Toasts.Type.SUCCESS
-            });
-        }
-    },
-
     userProfileBadges: [
         MallCordFounderBadge,
         MallCordDevBadge,
         MallCordContributorBadge,
+        UserPluginContributorBadge,
         MallCordSupporterBadge,
         MallCordDonorBadge,
         MallCordFriendBadge,
-        UserPluginContributorBadge
+        MaceSafeBadge
     ],
 
     async start() {
