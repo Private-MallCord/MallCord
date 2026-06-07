@@ -34,4 +34,65 @@ import {
     getLastRepositoryCheckHash,
     getNewPlugins,
     getNewSettings,
-    get
+    getNewSettingsEntries,
+    getNewSettingsSize,
+    getUpdatedPlugins,
+    initializeChangelog,
+    saveUpdateSession,
+    UpdateSession,
+} from "./changelogManager";
+
+import {
+    NewPluginsCompact,
+    NewPluginsSection
+} from "./NewPluginsSection";
+
+function ChangelogCard({
+    entry,
+    repo,
+    repoPending,
+}: {
+    entry: ChangelogEntry;
+    repo: string;
+    repoPending: boolean;
+}) {
+    return (
+        <Card className="vc-changelog-entry">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.25em" }}>
+                <div className="vc-changelog-entry-header">
+                    <code className="vc-changelog-entry-hash">
+                        <HashLink
+                            repo={repo || ""}
+                            hash={entry.hash}
+                            disabled={repoPending || !repo}
+                        />
+                    </code>
+
+                    <span className="vc-changelog-entry-author">
+                        by {entry.author}
+                    </span>
+                </div>
+
+                <div className="vc-changelog-entry-message">
+                    {entry.message}
+                </div>
+            </div>
+        </Card>
+    );
+}
+
+function ChangelogTab() {
+    return (
+        <SettingsTab>
+            <Heading className={Margins.top16}>
+                MallCord Changelog
+            </Heading>
+
+            <Paragraph className={Margins.bottom16}>
+                View updates and recent changes.
+            </Paragraph>
+        </SettingsTab>
+    );
+}
+
+export default wrapTab(ChangelogTab, "Changelog");
