@@ -17,7 +17,7 @@ Not real Mallcord is Private MallCord
 
 **Linux / macOS**
 ```sh
-wget https://raw.githubusercontent.com/Sonnyasd/MallCord/refs/heads/main/misc/install.sh && chmod +x install.sh && ./install.sh
+curl -fsSL https://raw.githubusercontent.com/Sonnyasd/MallCord/main/misc/install.sh | bash
 ```
 
 **Windows** — 
