@@ -22,14 +22,7 @@ export function VencordDonorModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             Vencord Donor
@@ -39,26 +32,12 @@ export function VencordDonorModal() {
             >
                 <div>
                     <Flex>
-                        <img
-                            role="presentation"
-                            src="https://cdn.discordapp.com/emojis/1026533070955872337.png"
-                            alt=""
-                            style={{ margin: "auto" }}
-                        />
-
-                        <img
-                            role="presentation"
-                            src="https://cdn.discordapp.com/emojis/1026533090627174460.png"
-                            alt=""
-                            style={{ margin: "auto" }}
-                        />
+                        <img role="presentation" src="https://cdn.discordapp.com/emojis/1026533070955872337.png" alt="" style={{ margin: "auto" }} />
+                        <img role="presentation" src="https://cdn.discordapp.com/emojis/1026533090627174460.png" alt="" style={{ margin: "auto" }} />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            This Badge is a special perk for Vencord Donors
-                        </Paragraph>
-
+                        <Paragraph>This Badge is a special perk for Vencord Donors</Paragraph>
                         <Paragraph className={Margins.top20}>
                             Please consider supporting the development of Vencord by becoming a donor.
                         </Paragraph>
@@ -83,14 +62,7 @@ export function MallCordDonorModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             MallCord Supporter
@@ -104,20 +76,12 @@ export function MallCordDonorModal() {
                             role="presentation"
                             src="https://iili.io/CfG9TKb.gif"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            This badge is a special perk for MallCord Supporters.
-                        </Paragraph>
-
+                        <Paragraph>This badge is a special perk for MallCord Supporters.</Paragraph>
                         <Paragraph className={Margins.top20}>
                             Support MallCord on Ko-fi to unlock this badge and support development.
                         </Paragraph>
@@ -142,14 +106,7 @@ export function MallCordTranslatorModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             MallCord Translator
                         </Flex>
@@ -158,18 +115,11 @@ export function MallCordTranslatorModal() {
             >
                 <div>
                     <Flex>
-                        <img
-                            className="vc-translate-modal-icon"
-                            role="presentation"
-                            src="https://badge.equicord.org/translator.png"
-                            alt=""
-                        />
+                        <img className="vc-translate-modal-icon" role="presentation" src="https://badge.equicord.org/translator.png" alt="" />
                     </Flex>
 
                     <div className="vc-translate-modal-paragraph">
-                        <Paragraph>
-                            Awarded to contributors who expand MallCord language support.
-                        </Paragraph>
+                        <Paragraph>Awarded to contributors who expand MallCord language support.</Paragraph>
                     </div>
                 </div>
 
@@ -191,14 +141,7 @@ export function MallCordFounderModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             MallCord Founder
@@ -212,19 +155,12 @@ export function MallCordFounderModal() {
                             role="presentation"
                             src="https://iili.io/C3jZGrg.th.png"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            This badge belongs to the founder of MallCord.
-                        </Paragraph>
+                        <Paragraph>This badge belongs to the founder of MallCord.</Paragraph>
                     </div>
                 </div>
             </Modal>
@@ -240,14 +176,7 @@ export function MallCordContributorModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             MallCord Contributor
@@ -261,22 +190,14 @@ export function MallCordContributorModal() {
                             role="presentation"
                             src="https://iili.io/C3jZGrg.th.png"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            Awarded to contributors helping develop MallCord.
-                        </Paragraph>
-
+                        <Paragraph>Awarded to contributors helping develop MallCord.</Paragraph>
                         <Paragraph className={Margins.top20}>
-                            Thank you for contributing to MallCord!
+                            Click the contributor badge to view the user's plugins.
                         </Paragraph>
                     </div>
                 </div>
@@ -293,14 +214,7 @@ export function MallCordDevModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             MallCord Dev
@@ -314,20 +228,12 @@ export function MallCordDevModal() {
                             role="presentation"
                             src="https://iili.io/C3jZGrg.th.png"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            This badge belongs to a MallCord Developer.
-                        </Paragraph>
-
+                        <Paragraph>This badge belongs to a MallCord Developer.</Paragraph>
                         <Paragraph className={Margins.top20}>
                             Official developer badge for MallCord staff.
                         </Paragraph>
@@ -346,14 +252,7 @@ export function MallCordFriendModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
                         <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             MallCord Friend
@@ -367,19 +266,12 @@ export function MallCordFriendModal() {
                             role="presentation"
                             src="https://iili.io/CqJFxlR.jpg"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
                     <div style={{ padding: "1em" }}>
-                        <Paragraph>
-                            This badge belongs to a close friend of MallCord.
-                        </Paragraph>
+                        <Paragraph>This badge belongs to a close friend of MallCord.</Paragraph>
                     </div>
                 </div>
             </Modal>
@@ -395,19 +287,8 @@ export function MaceSafeModal() {
             <Modal
                 {...props}
                 title={
-                    <Heading
-                        tag="h2"
-                        style={{
-                            width: "100%",
-                            textAlign: "center",
-                            margin: 0
-                        }}
-                    >
-                        <Flex
-                            justifyContent="center"
-                            alignItems="center"
-                            gap="0.5em"
-                        >
+                    <Heading tag="h2" style={{ width: "100%", textAlign: "center", margin: 0 }}>
+                        <Flex justifyContent="center" alignItems="center" gap="0.5em">
                             <Heart />
                             Mace Safe
                         </Flex>
@@ -420,12 +301,7 @@ export function MaceSafeModal() {
                             role="presentation"
                             src="https://iili.io/CfDblEJ.th.gif"
                             alt=""
-                            style={{
-                                margin: "auto",
-                                width: "96px",
-                                height: "96px",
-                                borderRadius: "50%"
-                            }}
+                            style={{ margin: "auto", width: "96px", height: "96px", borderRadius: "50%" }}
                         />
                     </Flex>
 
