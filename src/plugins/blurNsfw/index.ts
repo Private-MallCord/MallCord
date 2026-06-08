@@ -6,6 +6,7 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { managedStyleRootNode } from "@api/Styles";
+import { Devs } from "@utils/constants";
 import { createAndAppendStyle } from "@utils/css";
 import definePlugin, { OptionType } from "@utils/types";
 
@@ -36,21 +37,14 @@ function setCss() {
                 filter: blur(0);
             }
         }
-    `;
+        `;
 }
 
 export default definePlugin({
     name: "BlurNSFW",
     description: "Blur attachments in NSFW channels until hovered",
     tags: ["Privacy", "Appearance"],
-
-    authors: [
-        {
-            name: "sonnyasd",
-            id: 1469765555480297723n
-        }
-    ],
-
+    authors: [Devs.Ven],
     isModified: true,
     settings,
 

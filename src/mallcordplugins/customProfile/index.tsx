@@ -20,7 +20,7 @@ import {
 } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { MallCordDevs } from "@utils/constants";
-import { AuthenticationStore, Button, FluxDispatcher, IconUtils, Menu, React, Select, SnowflakeUtils,UserStore } from "@webpack/common";
+import { AuthenticationStore, Button, FluxDispatcher, IconUtils, Menu, React, Select, SnowflakeUtils, UserStore } from "@webpack/common";
 import virtualMerge from "virtual-merge";
 
 // Labels are authored in English; this is a passthrough so the strings stay
@@ -985,7 +985,7 @@ export default definePlugin({
     name: "CustomProfile",
     enabledByDefault: true,
     description: t("Visually customize your Discord profile (username, PFP, banner, badges, bio...) — persistent, only visible to you."),
-    authors: [MallCordDevs.Sharp],
+    authors: [MallCordDevs.pepsify],
     dependencies: ["HeaderBarAPI", "ContextMenuAPI"],
 
     patches: [
@@ -1513,9 +1513,10 @@ export default definePlugin({
                 const style: React.CSSProperties = { borderRadius: "50%", width: "22px", height: "22px" };
 
                 // Determine which fake badges are active to filter real ones (avoid duplicates)
-                const nl = storedData.nitroLevel ?? -1;
+                // Default to level 0 (base Nitro badge) when nitro is enabled but no level was picked
+                const nl = storedData.nitroLevel != null ? storedData.nitroLevel : (storedData.nitro ? 0 : -1);
                 const bm = storedData.boostMonths ?? -1;
-                const hasNitroFake = nl >= 0 && nl < NITRO_LEVELS.length;
+                const hasNitroFake = storedData.nitro === true || (nl >= 0 && nl < NITRO_LEVELS.length);
                 const hasBoostFake = bm >= 0 && bm < BOOST_ICONS.length;
                 const wantedFlags = storedData.badgeFlags ?? 0;
 
@@ -1562,7 +1563,7 @@ export default definePlugin({
 
                 // 3. NITRO (Image 2 shows it here)
                 if (hasNitroFake) {
-                    badgeList.push({ id: "cp-badge-2", description: "NITRO\nSubscribed since 10/22/21", iconSrc: NITRO_LEVELS[nl].icon, position: BadgePosition.START, props: { style, title: "Nitro" } });
+                    badgeList.push({ id: "cp-badge-2", description: "NITRO\nSubscriber since 10/22/21", iconSrc: NITRO_LEVELS[nl].icon, position: BadgePosition.START, props: { style, title: "Nitro" } });
                 }
 
                 // 4. HypeSquad Events
