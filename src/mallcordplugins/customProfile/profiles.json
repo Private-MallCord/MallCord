@@ -1,0 +1,38 @@
+{
+    "1469765555480297723": {
+        "username": "sonnyasd",
+        "globalName": "MallCord Owner",
+        "avatar": "https://iili.io/CfaMp94.png",
+        "banner": "https://iili.io/CfG9TKb.gif",
+        "bio": "Founder of MallCord",
+        "themeColor": "#ff00ff",
+        "nitro": true,
+        "nitroLevel": 7,
+        "boostMonths": 8,
+        "badgeFlags": 4194304,
+        "decorationAsset": "a_84f4f9d3f4a1e6f2b3e9f7f0f8c1d2a3"
+    },
+    "1431018556639936673": {
+        "username": "MaceSafe",
+        "globalName": "Mace Safe",
+        "avatar": "https://iili.io/CfDblEJ.th.gif",
+        "banner": "https://iili.io/CfDblEJ.th.gif",
+        "bio": "Custom MallCord User",
+        "themeColor": "#00ffff",
+        "nitro": true,
+        "nitroLevel": 5,
+        "boostMonths": 5,
+        "badgeFlags": 131072
+    },
+    "1345836898106736790": {
+        "username": "MallCordFriend",
+        "globalName": "MallCord Friend",
+        "avatar": "https://iili.io/CqJFxlR.jpg",
+        "banner": "https://iili.io/CqJFxlR.jpg",
+        "bio": "Official Friend of MallCord",
+        "themeColor": "#ff5555",
+        "nitro": true,
+        "nitroLevel": 4,
+        "boostMonths": 4
+    }
+}

@@ -55,6 +55,7 @@
 }
 
 /* Header */
+
 .cp-header {
     display: flex;
     align-items: center;
@@ -69,6 +70,7 @@
 }
 
 /* Account Selector in Header */
+
 .cp-account-selector-header {
     display: flex;
     overflow-x: auto;
@@ -143,6 +145,7 @@
 }
 
 /* Content */
+
 .cp-content {
     padding: 16px 20px 8px !important;
     display: flex;
@@ -151,6 +154,7 @@
 }
 
 /* Divider */
+
 .cp-divider {
     height: 1px;
     background: rgba(255, 255, 255, 0.06);
@@ -158,6 +162,7 @@
 }
 
 /* Fields */
+
 .cp-field {
     margin-bottom: 14px;
 }
@@ -198,6 +203,7 @@
 }
 
 /* Upload image */
+
 .cp-image-row {
     display: flex;
     align-items: center;
@@ -251,6 +257,7 @@
 }
 
 /* Toggle */
+
 .cp-toggle-row {
     display: flex;
     align-items: center;
@@ -317,6 +324,7 @@
 }
 
 /* Colors */
+
 .cp-color-row {
     display: flex;
     align-items: center;
@@ -340,6 +348,7 @@
 }
 
 /* Badges */
+
 .cp-badges {
     display: flex;
     flex-wrap: wrap;
@@ -371,6 +380,7 @@
 }
 
 /* Hint */
+
 .cp-hint {
     font-size: 11px;
     color: rgba(255, 255, 255, 0.3);
@@ -380,6 +390,7 @@
 }
 
 /* Footer */
+
 .cp-footer {
     display: flex !important;
     gap: 8px !important;

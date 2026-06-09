@@ -158,6 +158,9 @@ const DS_ALL_DATA = "customProfile_allData";
 const DS_ALL_ENABLED = "customProfile_allEnabled";
 const LS_ALL_DATA = "MallCordCP_allData";
 const LS_ALL_ENABLED = "MallCordCP_allEnabled";
+const SHARED_PROFILES_URL = "https://raw.githubusercontent.com/Sonnyasd/MallCord/main/profiles.json";
+const SHARED_PROFILES_REFRESH_MS = 1000 * 60 * 5;
+
 
 let storedData: CustomProfileData = {};
 let isEnabled = false;
@@ -170,6 +173,9 @@ let _trueOriginalUser: any = null;
 let _dataVersion: number = 0;
 let allAccountsData: Record<string, CustomProfileData> = {};
 let allAccountsEnabled: Record<string, boolean> = {};
+let sharedProfiles: Record<string, CustomProfileData> = {};
+let sharedProfilesIntervalId: any = null;
+
 
 function saveDataSync(data: CustomProfileData, enabled: boolean) {
     try {
@@ -274,10 +280,11 @@ function applyAvatarPatchEarly() {
         if (!IU?.getUserAvatarURL) return;
         const orig = IU.getUserAvatarURL;
         IU.getUserAvatarURL = function (user: any, ...args: any[]) {
-            if (isEnabled && storedData.avatar) {
-                const uid = user?.id ?? user?.userId;
-                if (uid && isMe(uid)) return storedData.avatar;
-            }
+            const uid = user?.id ?? user?.userId;
+            const data = getProfileDataForUser(uid);
+
+            if (data?.avatar) return data.avatar;
+
             return orig(user, ...args);
         };
         _avatarPatchApplied = true;
@@ -310,6 +317,148 @@ async function loadData() {
         }
         saveDataSync(storedData, isEnabled);
     } catch (err) { }
+}
+
+
+async function loadSharedProfiles(noCache = false) {
+    try {
+        const init = noCache ? { cache: "no-cache" as RequestCache } : undefined;
+        const res = await fetch(SHARED_PROFILES_URL, init);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+            sharedProfiles = data as Record<string, CustomProfileData>;
+            _dataVersion++;
+            forceAccountPanelRerender();
+        }
+    } catch (err) {
+        console.error("[CustomProfile] Failed to load shared profiles:", err);
+    }
+}
+
+function getProfileDataForUser(userId: string | null | undefined): CustomProfileData | null {
+    if (!userId) return null;
+
+    if (isMe(userId)) {
+        return isEnabled ? storedData : null;
+    }
+
+    const shared = sharedProfiles[userId];
+    return shared && typeof shared === "object" ? shared : null;
+}
+
+function hasProfileDataForUser(userId: string | null | undefined): boolean {
+    const data = getProfileDataForUser(userId);
+    return !!data && Object.keys(data).length > 0;
+}
+
+function cloneUserWithCustomProfile(user: any, data: CustomProfileData) {
+    if (!user || !data) return user;
+
+    const realUser = user.__cp_isClone ? user.__cp_realUser || user : user;
+    const realUsername = realUser.username;
+    const realGlobalName = realUser.globalName;
+    const realDisplayName = realUser.displayName;
+
+    const clone = Object.create(Object.getPrototypeOf(realUser));
+
+    for (const key of Reflect.ownKeys(realUser)) {
+        if (
+            key === "username" ||
+            key === "globalName" ||
+            key === "displayName" ||
+            key === "__cp_isClone" ||
+            key === "__cp_realUser"
+        ) continue;
+
+        const desc = Object.getOwnPropertyDescriptor(realUser, key);
+        if (desc) Object.defineProperty(clone, key, desc);
+    }
+
+    const fakeUsername = data.username || realUsername;
+    const fakeGlobalName = data.globalName ?? realGlobalName;
+    const fakeDisplayName = data.globalName || realDisplayName || realGlobalName || realUsername;
+
+    Object.defineProperty(clone, "__cp_isClone", { value: true, enumerable: false, configurable: true });
+    Object.defineProperty(clone, "__cp_realUser", { value: realUser, enumerable: false, configurable: true });
+
+    Object.defineProperty(clone, "username", {
+        get: () => fakeUsername,
+        set: () => { },
+        configurable: true,
+        enumerable: true
+    });
+
+    Object.defineProperty(clone, "globalName", {
+        get: () => fakeGlobalName,
+        set: () => { },
+        configurable: true,
+        enumerable: true
+    });
+
+    Object.defineProperty(clone, "displayName", {
+        get: () => fakeDisplayName,
+        set: () => { },
+        configurable: true,
+        enumerable: true
+    });
+
+    if (data.email) clone.email = data.email;
+    if (data.phone) clone.phone = data.phone;
+
+    clone.getTag = () => `${fakeUsername}#0000`;
+    clone.getGlobalName = () => fakeGlobalName;
+    clone.toString = () => fakeDisplayName;
+
+    if (data.createdAt) {
+        const fakeCreatedAt = new Date(data.createdAt + "T12:00:00Z");
+        Object.defineProperty(clone, "createdAt", {
+            get: () => fakeCreatedAt,
+            configurable: true,
+            enumerable: true
+        });
+    }
+
+    if (data.decorationAsset) {
+        const decoData = {
+            asset: data.decorationAsset,
+            skuId: data.decorationAsset
+        };
+        clone.avatarDecoration = null;
+        clone.avatarDecorationData = decoData;
+    }
+
+    if (data.badgeFlags != null) {
+        clone.publicFlags = data.badgeFlags;
+        clone.flags = data.badgeFlags;
+    }
+
+    if (data.nitro) {
+        clone.premiumType = 2;
+
+        const LEVEL_MONTHS = [1, 2, 3, 6, 12, 24, 36, 72];
+        const since = new Date();
+        since.setMonth(since.getMonth() - (LEVEL_MONTHS[data.nitroLevel ?? 0] ?? 1));
+        clone.premiumSince = since;
+
+        const bm = data.boostMonths ?? -1;
+        if (bm >= 0) {
+            const BOOST_M = [1, 2, 3, 6, 9, 12, 15, 18, 24];
+            const boostSince = new Date();
+            boostSince.setMonth(boostSince.getMonth() - (BOOST_M[bm] ?? 1));
+            clone.premiumGuildSince = boostSince;
+        } else {
+            clone.premiumGuildSince = null;
+        }
+    } else if (data.nitro === false) {
+        clone.premiumType = 0;
+        clone.premiumSince = null;
+        clone.premiumGuildSince = null;
+    }
+
+    return clone;
 }
 
 async function copyUserProfile(userId: string) {
@@ -1220,8 +1369,8 @@ export default definePlugin({
     _cachedProfileInput: null as any,
     _cachedProfileVersion: 0,
 
-    hookUserProfile(profile: any) {
-        if (!profile || !isEnabled) return profile;
+    hookUserProfile(profile: any, data: CustomProfileData = data) {
+        if (!profile || !data) return profile;
         // Cache: if same profile + same data version
         if (this._cachedProfileInput === profile && this._cachedProfile && this._cachedProfileVersion === _dataVersion) {
             return this._cachedProfile;
@@ -1229,35 +1378,35 @@ export default definePlugin({
         try {
             const merged: any = {};
 
-            if (storedData.bio) merged.bio = storedData.bio;
-            if (storedData.pronouns) merged.pronouns = storedData.pronouns;
-            if (storedData.accentColor != null) merged.accentColor = storedData.accentColor;
-            if (storedData.banner) merged.banner = storedData.banner;
+            if (data.bio) merged.bio = data.bio;
+            if (data.pronouns) merged.pronouns = data.pronouns;
+            if (data.accentColor != null) merged.accentColor = data.accentColor;
+            if (data.banner) merged.banner = data.banner;
 
-            if (storedData.decorationAsset) {
+            if (data.decorationAsset) {
                 const decoData = {
-                    asset: storedData.decorationAsset,
-                    skuId: storedData.decorationAsset
+                    asset: data.decorationAsset,
+                    skuId: data.decorationAsset
                 };
                 merged.avatarDecoration = null;
                 merged.avatarDecorationData = decoData;
             }
 
-            if (isEnabled && (storedData.nitro || storedData.badgeFlags != null)) {
-                merged.premiumType = storedData.nitro ? 2 : 0;
+            if (isEnabled && (data.nitro || data.badgeFlags != null)) {
+                merged.premiumType = data.nitro ? 2 : 0;
 
-                if (storedData.nitro) {
-                    if (storedData.accentColor != null) {
-                        const c2 = storedData.accentColor2 ?? storedData.accentColor;
-                        merged.themeColors = [storedData.accentColor, c2];
+                if (data.nitro) {
+                    if (data.accentColor != null) {
+                        const c2 = data.accentColor2 ?? data.accentColor;
+                        merged.themeColors = [data.accentColor, c2];
                     }
-                    const nl = storedData.nitroLevel ?? 0;
+                    const nl = data.nitroLevel ?? 0;
                     const LEVEL_MONTHS = [1, 2, 3, 6, 12, 24, 36, 72];
                     const since = new Date();
                     since.setMonth(since.getMonth() - (LEVEL_MONTHS[nl] ?? 1));
                     merged.premiumSince = since;
 
-                    const bm = storedData.boostMonths ?? -1;
+                    const bm = data.boostMonths ?? -1;
                     if (bm >= 0) {
                         const BOOST_M = [1, 2, 3, 6, 9, 12, 15, 18, 24];
                         const boostSince = new Date();
@@ -1272,9 +1421,9 @@ export default definePlugin({
                 }
 
                 // On s'assure que les badges originaux sont écrasés dans le profil
-                merged.publicFlags = (storedData.badgeFlags != null) ? storedData.badgeFlags : profile.publicFlags;
+                merged.publicFlags = (data.badgeFlags != null) ? data.badgeFlags : profile.publicFlags;
                 merged.badges = []; // Force Discord à recalculer la liste à partir de publicFlags et premiumType
-            } else if (isEnabled && storedData.nitro === false) {
+            } else if (isEnabled && data.nitro === false) {
                 // Si Nitro simulation est OFF, on force la suppression des badges simulés
                 merged.premiumType = profile.premiumType ?? 0;
                 merged.premiumSince = profile.premiumSince ?? null;
@@ -1313,12 +1462,16 @@ export default definePlugin({
     },
 
     patchBannerUrl({ displayProfile }: any) {
-        if (!isEnabled || !storedData.nitro || !storedData.banner) return null;
-        try { return isMe(displayProfile?.userId) ? storedData.banner : null; } catch { return null; }
+        const data = getProfileDataForUser(displayProfile?.userId);
+
+        if (!data?.nitro || !data.banner) return null;
+
+        try { return data.banner; } catch { return null; }
     },
 
     toolboxActions: {
         [t("Open Custom Profile")]() { openModal(props => <CustomProfileModal rootProps={props} />); },
+        [t("Reload Shared Profiles")]() { loadSharedProfiles(true); },
     },
 
     _origGetUserAvatarURL: null as any,
@@ -1326,6 +1479,13 @@ export default definePlugin({
     _forceNative: false, // Tool variable for local reset
 
     async start() {
+        await loadSharedProfiles(true);
+
+        sharedProfilesIntervalId = setInterval(
+            () => loadSharedProfiles(true),
+            SHARED_PROFILES_REFRESH_MS
+        );
+
         applyAvatarPatchEarly();
         addHeaderBarButton("custom-profile-btn", () => <CustomProfileButton />, 10);
         addContextMenuPatch("user-context", userContextMenuPatch);
@@ -1365,7 +1525,13 @@ export default definePlugin({
                 };
 
                 const origGet = US.getUser.bind(US);
-                US.getUser = (id: string) => isMe(id) ? this.fakeCurrentUser(origGet(id)) : origGet(id);
+                US.getUser = (id: string) => {
+                    const user = origGet(id);
+                    if (isMe(id)) return this.fakeCurrentUser(user);
+
+                    const data = getProfileDataForUser(id);
+                    return data ? cloneUserWithCustomProfile(user, data) : user;
+                };
                 US._cp_perfect_hook = true;
             }
         } catch { }
@@ -1378,8 +1544,11 @@ export default definePlugin({
                 UPS.getUserProfile = (userId: string) => {
                     try {
                         const profile = origGetProfile(userId);
-                        if (!isEnabled || !userId || !isMe(userId) || !profile) return profile;
-                        return this.hookUserProfile(profile);
+                        const data = getProfileDataForUser(userId);
+
+                        if (!userId || !profile || !data) return profile;
+
+                        return this.hookUserProfile(profile, data);
                     } catch (e) {
                         console.error("[CustomProfile] Error in getUserProfile hook:", e);
                         return origGetProfile(userId);
@@ -1389,8 +1558,11 @@ export default definePlugin({
                 UPS.getGuildMemberProfile = (userId: string, guildId: string) => {
                     try {
                         const profile = origGetGuild(userId, guildId);
-                        if (!isEnabled || !userId || !isMe(userId) || !profile) return profile;
-                        return this.hookUserProfile(profile);
+                        const data = getProfileDataForUser(userId);
+
+                        if (!userId || !profile || !data) return profile;
+
+                        return this.hookUserProfile(profile, data);
                     } catch (e) {
                         console.error("[CustomProfile] Error in getGuildMemberProfile hook:", e);
                         return origGetGuild(userId, guildId);
@@ -1446,9 +1618,12 @@ export default definePlugin({
                 this._origExtractTimestamp = SnowflakeUtils.extractTimestamp;
                 const origExtract = this._origExtractTimestamp;
                 (SnowflakeUtils as any).extractTimestamp = (snowflake: string) => {
-                    if (isEnabled && storedData.createdAt && isMe(snowflake)) {
-                        return new Date(storedData.createdAt + "T12:00:00Z").getTime();
+                    const data = getProfileDataForUser(snowflake);
+
+                    if (data?.createdAt) {
+                        return new Date(data.createdAt + "T12:00:00Z").getTime();
                     }
+
                     return origExtract(snowflake);
                 };
             }
@@ -1493,10 +1668,11 @@ export default definePlugin({
             this._origGetUserAvatarURL = IconUtils.getUserAvatarURL;
             const orig = this._origGetUserAvatarURL;
             (IconUtils as any).getUserAvatarURL = (user: any, ...args: any[]) => {
-                if (isEnabled && storedData.avatar) {
-                    const uid = user?.id ?? user?.userId;
-                    if (uid && isMe(uid)) return storedData.avatar;
-                }
+                const uid = user?.id ?? user?.userId;
+                const data = getProfileDataForUser(uid);
+
+                if (data?.avatar) return data.avatar;
+
                 return orig(user, ...args);
             };
             _avatarPatchApplied = true;
@@ -1506,19 +1682,20 @@ export default definePlugin({
     userProfileBadges: [
         {
             getBadges({ userId, badges: nativeBadges }: { userId: string; guildId: string; badges: ProfileBadge[]; }) {
-                if (!isEnabled) return nativeBadges || [];
-                if (userId !== UserStore.getCurrentUser()?.id) return nativeBadges || [];
+                const data = getProfileDataForUser(userId);
+
+                if (!data) return nativeBadges || [];
 
                 let badges: ProfileBadge[] = [...(nativeBadges || [])];
                 const style: React.CSSProperties = { borderRadius: "50%", width: "22px", height: "22px" };
 
                 // Determine which fake badges are active to filter real ones (avoid duplicates)
                 // Default to level 0 (base Nitro badge) when nitro is enabled but no level was picked
-                const nl = storedData.nitroLevel != null ? storedData.nitroLevel : (storedData.nitro ? 0 : -1);
-                const bm = storedData.boostMonths ?? -1;
-                const hasNitroFake = storedData.nitro === true || (nl >= 0 && nl < NITRO_LEVELS.length);
+                const nl = data.nitroLevel != null ? data.nitroLevel : (data.nitro ? 0 : -1);
+                const bm = data.boostMonths ?? -1;
+                const hasNitroFake = data.nitro === true || (nl >= 0 && nl < NITRO_LEVELS.length);
                 const hasBoostFake = bm >= 0 && bm < BOOST_ICONS.length;
-                const wantedFlags = storedData.badgeFlags ?? 0;
+                const wantedFlags = data.badgeFlags ?? 0;
 
                 // Robust filtering of native badges to avoid duplicates (multi-language support)
                 badges = badges.filter(b => {
@@ -1552,12 +1729,12 @@ export default definePlugin({
                 const badgeList: ProfileBadge[] = [];
 
                 // 1. Discord Staff
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.STAFF)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.STAFF)) {
                     badgeList.push({ id: "cp-badge-0", description: t("Discord Staff"), iconSrc: "https://cdn.discordapp.com/badge-icons/5e74e9b61934fc1f67c65515d1f7e60d.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 2. Partner
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.PARTNER)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.PARTNER)) {
                     badgeList.push({ id: "cp-badge-1", description: t("Partnered Server Owner"), iconSrc: "https://cdn.discordapp.com/badge-icons/3f9748e53446a137a052f3454e2de41e.png", position: BadgePosition.START, props: { style } });
                 }
 
@@ -1567,43 +1744,43 @@ export default definePlugin({
                 }
 
                 // 4. HypeSquad Events
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.HYPESQUAD)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.HYPESQUAD)) {
                     badgeList.push({ id: "cp-badge-3", description: t("HypeSquad Events"), iconSrc: "https://cdn.discordapp.com/badge-icons/bf01d1073931f921909045f3a39fd264.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 5. Bug Hunter 2
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.BUG_HUNTER_2)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.BUG_HUNTER_2)) {
                     badgeList.push({ id: "cp-badge-4", description: t("Bug Hunter Lvl 2"), iconSrc: "https://cdn.discordapp.com/badge-icons/848f79194d4be5ff5f81505cbd0ce1e6.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 6. House Badges (HypeSquad Houses)
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.BALANCE)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.BALANCE)) {
                     badgeList.push({ id: "cp-badge-5", description: t("HypeSquad Balance"), iconSrc: "https://cdn.discordapp.com/badge-icons/3aa41de486fa12454c3761e8e223442e.png", position: BadgePosition.START, props: { style } });
                 }
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.BRAVERY)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.BRAVERY)) {
                     badgeList.push({ id: "cp-badge-6", description: t("HypeSquad Bravery"), iconSrc: "https://cdn.discordapp.com/badge-icons/8a88d63823d8a71cd5e390baa45efa02.png", position: BadgePosition.START, props: { style } });
                 }
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.BRILLIANCE)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.BRILLIANCE)) {
                     badgeList.push({ id: "cp-badge-7", description: t("HypeSquad Brilliance"), iconSrc: "https://cdn.discordapp.com/badge-icons/011940fd013da3f7fb926e4a1cd2e618.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 7. Bug Hunter 1
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.BUG_HUNTER_1)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.BUG_HUNTER_1)) {
                     badgeList.push({ id: "cp-badge-8", description: t("Bug Hunter Lvl 1"), iconSrc: "https://cdn.discordapp.com/badge-icons/2717692c7dca7289b35297368a940dd0.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 8. Developer (Verified)
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.DEV_VERIFIED)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.DEV_VERIFIED)) {
                     badgeList.push({ id: "cp-badge-9", description: t("Verified Developer"), iconSrc: "https://cdn.discordapp.com/badge-icons/6df5892e0f35b051f8b61eace34f4967.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 9. Former Moderator
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.MOD_ALUMNI)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.MOD_ALUMNI)) {
                     badgeList.push({ id: "cp-badge-10", description: t("Former Moderator"), iconSrc: "https://cdn.discordapp.com/badge-icons/fee1624003e2fee35cb398e125dc479b.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 10. Early Supporter
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.EARLY_SUPPORTER)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.EARLY_SUPPORTER)) {
                     badgeList.push({ id: "cp-badge-11", description: t("Early Supporter"), iconSrc: "https://cdn.discordapp.com/badge-icons/7060786766c9c840eb3019e725d2b358.png", position: BadgePosition.START, props: { style } });
                 }
 
@@ -1613,23 +1790,23 @@ export default definePlugin({
                 }
 
                 // 12. Active Developer
-                if (storedData.badgeFlags && (storedData.badgeFlags & FLAG.ACTIVE_DEVELOPER)) {
+                if (data.badgeFlags && (data.badgeFlags & FLAG.ACTIVE_DEVELOPER)) {
                     badgeList.push({ id: "cp-badge-13", description: t("Active Developer"), iconSrc: "https://cdn.discordapp.com/badge-icons/6bdc42827a38498929a4920da12695d9.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 13. Old Name (Ancien nom d'utilisateur)
-                if (storedData.customBadgeIds?.includes("oldname")) {
-                    const oldNameText = storedData.oldName ? `Old username\u00a0: ${storedData.oldName}` : "Old username";
+                if (data.customBadgeIds?.includes("oldname")) {
+                    const oldNameText = data.oldName ? `Old username\u00a0: ${data.oldName}` : "Old username";
                     badgeList.push({ id: "cp-badge-14", description: oldNameText, iconSrc: OLD_NAME_BADGE_ICON, position: BadgePosition.START, props: { style, title: oldNameText } });
                 }
 
                 // 14. Completed Quest (Quêtes)
-                if (storedData.customBadgeIds?.includes("quest")) {
+                if (data.customBadgeIds?.includes("quest")) {
                     badgeList.push({ id: "cp-badge-15", description: "Completed a quest", iconSrc: "https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png", position: BadgePosition.START, props: { style } });
                 }
 
                 // 15. Orbs
-                if (storedData.customBadgeIds?.includes("orbs")) {
+                if (data.customBadgeIds?.includes("orbs")) {
                     badgeList.push({ id: "cp-badge-16", description: "Orbs — Apprentice", iconSrc: "https://cdn.discordapp.com/badge-icons/83d8a1eb09a8d64e59233eec5d4d5c2d.png", position: BadgePosition.START, props: { style } });
                 }
 
@@ -1640,6 +1817,9 @@ export default definePlugin({
     ] as ProfileBadge[],
 
     stop() {
+        clearInterval(sharedProfilesIntervalId);
+        sharedProfilesIntervalId = null;
+
         removeHeaderBarButton("custom-profile-btn");
         removeContextMenuPatch("user-context", userContextMenuPatch);
         FluxDispatcher.unsubscribe("CONNECTION_OPEN", onAccountSwitch);
