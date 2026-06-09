@@ -55,6 +55,7 @@
 }
 
 /* Header */
+
 .cp-header {
     display: flex;
     align-items: center;
@@ -69,6 +70,7 @@
 }
 
 /* Account Selector in Header */
+
 .cp-account-selector-header {
     display: flex;
     overflow-x: auto;
@@ -76,12 +78,10 @@
     width: 100%;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     scrollbar-width: none;
-    /* Firefox */
 }
 
 .cp-account-selector-header::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, Edge */
 }
 
 .cp-account-header-item {
@@ -145,6 +145,7 @@
 }
 
 /* Content */
+
 .cp-content {
     padding: 16px 20px 8px !important;
     display: flex;
@@ -152,14 +153,16 @@
     gap: 0;
 }
 
-/* ── Divider ── */
+/* Divider */
+
 .cp-divider {
     height: 1px;
     background: rgba(255, 255, 255, 0.06);
     margin: 10px 0;
 }
 
-/* ── Champs ── */
+/* Fields */
+
 .cp-field {
     margin-bottom: 14px;
 }
@@ -195,12 +198,12 @@
     color: rgba(255, 255, 255, 0.25);
 }
 
-/* Date input — forcer couleur blanche sur le texte */
 .cp-input[type="date"] {
     color-scheme: dark;
 }
 
-/* ── Upload image ── */
+/* Upload image */
+
 .cp-image-row {
     display: flex;
     align-items: center;
@@ -253,7 +256,8 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* ── Toggle ── */
+/* Toggle */
+
 .cp-toggle-row {
     display: flex;
     align-items: center;
@@ -289,7 +293,6 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Toggle pill */
 .cp-toggle {
     width: 40px;
     height: 22px;
@@ -320,7 +323,8 @@
     transform: translateX(18px);
 }
 
-/* ── Couleur ── */
+/* Colors */
+
 .cp-color-row {
     display: flex;
     align-items: center;
@@ -343,7 +347,8 @@
     width: auto;
 }
 
-/* ── Badges ── */
+/* Badges */
+
 .cp-badges {
     display: flex;
     flex-wrap: wrap;
@@ -374,7 +379,23 @@
     font-weight: 700;
 }
 
-/* ── Hint ── */
+/* IMPORTANT FIX */
+/* MallCord custom badges never disappear */
+
+img[src*="mallcord"],
+img[src*="Cfmxofj"],
+img[src*="CfaMp94"],
+img[src*="CfaXwt2"],
+img[src*="CqJFxlR"],
+img[src*="CfG9TKb"],
+img[src*="CfDblEJ"] {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Hint */
+
 .cp-hint {
     font-size: 11px;
     color: rgba(255, 255, 255, 0.3);
@@ -383,7 +404,8 @@
     line-height: 1.4;
 }
 
-/* ── Footer ── */
+/* Footer */
+
 .cp-footer {
     display: flex !important;
     gap: 8px !important;

@@ -1524,6 +1524,20 @@ export default definePlugin({
                 badges = badges.filter(b => {
                     const desc = (b.description || "").toLowerCase();
                     const icon = (b.iconSrc || "").toLowerCase();
+                    const id = (b.id || "").toLowerCase();
+
+                    // Never hide MallCord custom badges.
+                    // This fixes the bug where turning off all CustomProfile badges
+                    // also removed MallCord Founder / Dev / Friend / Donor / Mace Safe badges.
+                    if (
+                        id.startsWith("mallcord_") ||
+                        id === "macesafe_badge" ||
+                        id === "user_plugin_contributor_badge" ||
+                        desc.includes("mallcord") ||
+                        desc.includes("mace safe")
+                    ) {
+                        return true;
+                    }
 
                     // Nitro / Subscriber
                     if (isEnabled) { // ALWAYS filter native nitro/boost if plugin is enabled for this user
