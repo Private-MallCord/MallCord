@@ -1273,7 +1273,12 @@ export default definePlugin({
 
                 // On s'assure que les badges originaux sont écrasés dans le profil
                 merged.publicFlags = (storedData.badgeFlags != null) ? storedData.badgeFlags : profile.publicFlags;
-                merged.badges = []; // Force Discord à recalculer la liste à partir de publicFlags et premiumType
+                // IMPORTANT:
+                // Do NOT set merged.badges = [] here.
+                // Wiping profile.badges can also wipe BadgeAPI/MallCord badges
+                // like MallCord Founder / Dev / Friend / Donor / Mace Safe
+                // when every CustomProfile badge is disabled.
+                // Native Discord badge duplicates are filtered below in userProfileBadges instead.
             } else if (isEnabled && storedData.nitro === false) {
                 // Si Nitro simulation est OFF, on force la suppression des badges simulés
                 merged.premiumType = profile.premiumType ?? 0;
@@ -1526,15 +1531,17 @@ export default definePlugin({
                     const icon = (b.iconSrc || "").toLowerCase();
                     const id = (b.id || "").toLowerCase();
 
-                    // Never hide MallCord custom badges.
-                    // This fixes the bug where turning off all CustomProfile badges
-                    // also removed MallCord Founder / Dev / Friend / Donor / Mace Safe badges.
+                    // Never hide MallCord / BadgeAPI custom badges.
+                    // Anything added in badge/index.tsx with a custom id must stay visible,
+                    // even when every CustomProfile Discord badge is disabled.
                     if (
                         id.startsWith("mallcord_") ||
+                        id.startsWith("mace") ||
                         id === "macesafe_badge" ||
                         id === "user_plugin_contributor_badge" ||
                         desc.includes("mallcord") ||
-                        desc.includes("mace safe")
+                        desc.includes("mace safe") ||
+                        desc.includes("macesafe")
                     ) {
                         return true;
                     }
