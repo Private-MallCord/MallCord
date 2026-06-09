@@ -442,3 +442,87 @@
 .cp-btn-primary:hover:not(:disabled) {
     background: #4752c4;
 }
+
+/* NEW PREMIUM EFFECTS */
+
+.cp-modal-glow {
+    animation: cpGlow 3s infinite alternate;
+}
+
+@keyframes cpGlow {
+    from {
+        box-shadow: 0 0 12px rgba(88, 101, 242, 0.3);
+    }
+
+    to {
+        box-shadow: 0 0 22px rgba(88, 101, 242, 0.6);
+    }
+}
+
+.cp-badge-premium {
+    background: linear-gradient(90deg, #5865f2, #eb459e);
+    color: white;
+    border: none;
+}
+
+.cp-badge-premium:hover {
+    filter: brightness(1.15);
+}
+
+.cp-rainbow-text {
+    background: linear-gradient(90deg, #ff0000, #ff9900, #ffee00, #33ff00, #00ffee, #0066ff, #cc00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: cpRainbow 4s linear infinite;
+    background-size: 400%;
+}
+
+@keyframes cpRainbow {
+    0% {
+        background-position: 0%;
+    }
+
+    100% {
+        background-position: 400%;
+    }
+}
+
+.cp-animated-border {
+    position: relative;
+    overflow: hidden;
+}
+
+.cp-animated-border::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(90deg, #5865f2, #eb459e, #00ffee, #5865f2);
+    background-size: 400%;
+    animation: cpBorder 5s linear infinite;
+    z-index: -1;
+    border-radius: inherit;
+}
+
+@keyframes cpBorder {
+    0% {
+        background-position: 0%;
+    }
+
+    100% {
+        background-position: 400%;
+    }
+}
+
+.cp-profile-card {
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+    background: rgba(20, 20, 25, 0.75);
+}
+
+.cp-hover-scale {
+    transition: transform .15s ease;
+}
+
+.cp-hover-scale:hover {
+    transform: scale(1.04);
+}

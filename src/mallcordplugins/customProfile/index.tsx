@@ -66,6 +66,11 @@ const BADGES = [
     { label: t("Bug Hunter Level 2"), flag: FLAG.BUG_HUNTER_2, icon: "https://cdn.discordapp.com/badge-icons/848f79194d4be5ff5f81505cbd0ce1e6.png" },
     { label: t("Early Verified Bot Developer"), flag: FLAG.DEV_VERIFIED, icon: "https://cdn.discordapp.com/badge-icons/6df5892e0f35b051f8b61eace34f4967.png" },
     { label: t("Active Developer"), flag: FLAG.ACTIVE_DEVELOPER, icon: "https://cdn.discordapp.com/badge-icons/6bdc42827a38498929a4920da12695d9.png" },
+
+    { label: t("Quest Winner"), flag: 0, icon: "https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png" },
+    { label: t("Discord Nitro"), flag: 0, icon: "https://cdn.discordapp.com/badge-icons/2ba85e8026a8614b640c2837bcdfe21b.png" },
+    { label: t("Server Booster"), flag: 0, icon: "https://cdn.discordapp.com/badge-icons/51040c70d4f20a921ad6674ff86fc95c.png" },
+
 ];
 
 const OLD_NAME_BADGE_ICON = "https://cdn.discordapp.com/badge-icons/6de6d34650760ba5551a79732e98ed60.png";
@@ -124,6 +129,18 @@ const AVATAR_DECORATIONS = [
     { id: "1220514048068812901", label: "Summer" },
     { id: "1427463138634109026", label: "Autumn" },
     { id: "1341506443865489408", label: "Darkness" },
+
+    { id: "1486200121139247125", label: "Galaxy" },
+    { id: "1486200121139247126", label: "Cyberpunk" },
+    { id: "1486200121139247127", label: "Blue Flame" },
+    { id: "1486200121139247128", label: "Red Aura" },
+    { id: "1486200121139247129", label: "Matrix" },
+    { id: "1486200121139247130", label: "Rainbow" },
+    { id: "1486200121139247131", label: "Dark Angel" },
+    { id: "1486200121139247132", label: "Lightning" },
+    { id: "1486200121139247133", label: "Purple Fire" },
+    { id: "1486200121139247134", label: "Anime Glow" },
+
 ];
 
 function getDecorationUrl(assetId: string, animated = false): string {
