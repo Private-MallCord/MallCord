@@ -53,7 +53,6 @@ const MallCordFounderBadge: ProfileBadge = {
     iconSrc: FOUNDER_BADGE,
     position: BadgePosition.START,
     shouldShow: ({ userId }) => userId === "1469765555480297723",
-    onClick: () => MallCordFounderModal(),
     props: {
         style: {
             borderRadius: "50%",
@@ -68,7 +67,6 @@ const MallCordDevBadge: ProfileBadge = {
     iconSrc: MALLCORD_DEV_BADGE,
     position: BadgePosition.START,
     shouldShow: ({ userId }) => userId === "1469765555480297723",
-    onClick: () => MallCordDevModal(),
     props: {
         style: {
             borderRadius: "50%",
@@ -155,7 +153,6 @@ const MallCordFriendBadge: ProfileBadge = {
     shouldShow: ({ userId }) =>
         userId === "1345836898106736790" ||
         userId === "1385182510396477557",
-    onClick: () => MallCordFriendModal(),
     props: {
         style: {
             borderRadius: "50%",
