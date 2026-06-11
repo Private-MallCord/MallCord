@@ -16,7 +16,7 @@ echo.
 :: ── Mode selection ────────────────────────────────────────────────────────────
 echo   What would you like to do?
 echo   [1] Install / Update Private MallCord
-echo   [2] Uninstall MallCord
+echo   [2] Uninstall Private MallCord
 echo.
 choice /C 12 /M "   Choose an option"
 set MODE_CHOICE=!errorlevel!
