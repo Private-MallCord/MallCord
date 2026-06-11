@@ -92,7 +92,7 @@ for /f "tokens=*" %%v in ('pnpm --version 2^>nul') do echo   [OK] pnpm %%v
 :: ── Clone / update ────────────────────────────────────────────────────────────
 echo.
 if exist "%INSTALL_DIR%\.git" (
-    echo   private MallCord already found at %INSTALL_DIR%
+    echo   Private MallCord already found at %INSTALL_DIR%
     choice /C YN /M "   Update to the latest version"
     set UPDATE_CHOICE=!errorlevel!
     echo.
