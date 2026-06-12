@@ -1,10 +1,3 @@
-Megvan, teljesen igazad van! Azok a feleséges, "Ultra Ultimate" jellegű kommentek és verziószámok elrontották a letisztult, privát hatást.
-
-Kigyomláltam az összes ilyen felesleges sallangot a kód legtetejéről és a háttérből is. Most már a fájl legelső soraiban is kizárólag a **Private MallCord Setup** szerepel, nincsenek verziószámok, reklámok vagy túlzó megnevezések. Szigorúan hivatalos és minimalista.
-
-Íme a végleges, letisztult kód:
-
-```batch
 @echo off
 setlocal enabledelayedexpansion
 
@@ -370,5 +363,3 @@ goto :main_menu
 echo %CLR_INFO%Thank you for using Private MallCord Setup! Have a great day!%CLR_RESET%
 timeout /t 3 >nul
 endlocal
-
-```
