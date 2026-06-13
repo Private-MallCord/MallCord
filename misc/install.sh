@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # ================================================
-# Private MallCord Setup
-# Usage: bash install.sh
+# Private MallCord Setup (Linux/macOS)
 # ================================================
 
 REPO_URL="https://github.com/Sonnyasd/MallCord"
 INSTALL_DIR="$HOME/PrivateMallCord"
+BACKUP_DIR="$HOME/PrivateMallCord_Backup"
 
 echo
 echo "================================================"
-echo "         Private MallCord Setup"
+echo "     Private MallCord Setup"
 echo "================================================"
 echo
 
@@ -17,11 +17,24 @@ echo "What would you like to do?"
 echo "[1] Install / Update"
 echo "[2] Check for Updates"
 echo "[3] Uninstall"
-echo "[4] Exit"
+echo "[4] Rollback to Backup"
+echo "[5] Exit"
 echo
-read -p "Choose an option [1-4]: " CHOICE
+read -p "Choose an option [1-5]: " CHOICE
+
+if [ "$CHOICE" = "5" ]; then
+    exit 0
+fi
 
 if [ "$CHOICE" = "4" ]; then
+    if [ ! -d "$BACKUP_DIR" ]; then
+        echo "No backup found."
+        exit 1
+    fi
+    echo "Restoring from backup..."
+    rm -rf "$INSTALL_DIR"
+    cp -r "$BACKUP_DIR" "$INSTALL_DIR"
+    echo "Rollback completed successfully!"
     exit 0
 fi
 
@@ -95,8 +108,16 @@ if ! command -v pnpm >/dev/null; then
     npm install -g pnpm
 fi
 
+# Create backup before updating
+if [ -d "$INSTALL_DIR" ]; then
+    echo "Creating backup..."
+    rm -rf "$BACKUP_DIR"
+    cp -r "$INSTALL_DIR" "$BACKUP_DIR"
+fi
+
 echo
-echo "Cloning / Updating repository..."
+echo "Installing / Updating Private MallCord..."
+
 if [ -d "$INSTALL_DIR/.git" ]; then
     cd "$INSTALL_DIR"
     git fetch origin main
@@ -106,7 +127,7 @@ else
     if [ -d "$INSTALL_DIR" ]; then rm -rf "$INSTALL_DIR"; fi
     git clone "$REPO_URL" "$INSTALL_DIR"
     cd "$INSTALL_DIR"
-    echo "[OK] Cloned."
+    echo "[OK] Cloned successfully."
 fi
 
 echo "Installing dependencies..."
