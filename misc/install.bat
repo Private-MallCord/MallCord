@@ -1,145 +1,239 @@
 @echo off
 setlocal enabledelayedexpansion
-chcp 65001 >nul 2>&1
 
 :: ================================================
-:: Private MallCord - Official Installer
+::       Private MallCord Setup
 :: ================================================
-
+title Private MallCord Setup vBETA
+set "VERSION=vBETA"
 set "REPO_URL=https://github.com/Sonnyasd/MallCord"
 set "INSTALL_DIR=%USERPROFILE%\PrivateMallCord"
+set "BRANCH=main"
+set "LOGFILE=%INSTALL_DIR%\PrivateMallCord_Install.log"
+set "DISCORD_PATH="
 
+cls
 echo.
-echo +---------------------------------+
-echo ^|   Private MallCord Setup        ^|
-echo +---------------------------------+
+echo   +---------------------------------------------+
+echo   ^|        Private MallCord Setup %VERSION%     ^|
+echo   +---------------------------------------------+
 echo.
-echo What would you like to do?
-echo [1] Install / Update
-echo [2] Check for Updates
-echo [3] Uninstall
+
+:: ── Main Menu ───────────────────────────────────────────────────────────────
+echo   What would you like to do?
 echo.
-choice /C 123 /M " Choose an option"
+echo   [1] Install / Update
+echo   [2] Check for Updates
+echo   [3] Force Clean Reinstall
+echo   [4] Repair Installation
+echo   [5] Discord Client Selector + Start
+echo   [6] Set Manual Discord Path
+echo   [7] Open GitHub Repository
+echo   [8] View Log File
+echo   [9] Uninstall
+echo.
+choice /C 123456789 /M "   Select option" /N
 set "MODE_CHOICE=!errorlevel!"
+
 echo.
 
-if !MODE_CHOICE! equ 3 goto :uninstall
-if !MODE_CHOICE! equ 2 goto :check_update
-
-:: ===================== INSTALL / UPDATE =====================
+:: Admin warning
 net session >nul 2>&1
 if !errorlevel! equ 0 (
-    echo WARNING: You are running as Administrator.
-    echo This can break Discord. Run as normal user instead.
-    echo.
-    choice /C YN /M " Continue anyway"
+    echo   [91mWARNING: Running as Administrator is not recommended![0m
+    choice /C YN /M "   Continue anyway?" /N
     if !errorlevel! equ 2 goto :end
 )
 
-echo Closing Discord...
-taskkill /F /IM Discord.exe >nul 2>&1
-taskkill /F /IM DiscordPTB.exe >nul 2>&1
-taskkill /F /IM DiscordCanary.exe >nul 2>&1
+if !MODE_CHOICE! equ 9 goto :uninstall
+if !MODE_CHOICE! equ 8 goto :viewlog
+if !MODE_CHOICE! equ 7 goto :openrepo
+if !MODE_CHOICE! equ 6 goto :manualdiscordpath
+if !MODE_CHOICE! equ 5 goto :discordselector
+if !MODE_CHOICE! equ 2 goto :checkupdates
+if !MODE_CHOICE! equ 3 goto :forcereinstall
+if !MODE_CHOICE! equ 4 goto :repair
 
-where git >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: git not found.
-    echo Install it from https://git-scm.com/download/win
-    goto :fail
-)
+:: ════════════════════════════════════════════════════════════
+::              INSTALL / UPDATE
+:: ════════════════════════════════════════════════════════════
+:install
+call :log "=== Starting Install/Update %VERSION% ==="
 
-where node >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: Node.js not found.
-    echo Install LTS from https://nodejs.org
-    goto :fail
-)
+echo   Closing Discord processes...
+taskkill /f /im discord.exe >nul 2>&1
+taskkill /f /im Discord.exe >nul 2>&1
+taskkill /f /im ptb.exe >nul 2>&1
+taskkill /f /im canary.exe >nul 2>&1
 
-node -e "if(parseInt(process.version.slice(1))<18)process.exit(1)" >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: Node.js v18+ required.
-    goto :fail
-)
+echo   Checking prerequisites...
+where git >nul 2>&1 || (echo   [91mERROR: git not found![0m & goto :fail)
+where node >nul 2>&1 || (echo   [91mERROR: Node.js not found![0m & goto :fail)
 
-where pnpm >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Installing pnpm...
-    call npm install -g pnpm
-)
+if not defined DISCORD_PATH call :autodetectdiscord
 
-echo.
 if exist "%INSTALL_DIR%\.git" (
-    echo Private MallCord already found.
-    echo Updating to latest version...
+    echo   Creating backup...
+    set "BACKUP_DIR=%INSTALL_DIR%_backup_%DATE:~-4%%DATE:~-7,2%%DATE:~-10,2%"
+    xcopy "%INSTALL_DIR%" "!BACKUP_DIR!" /s /e /i /y >nul 2>&1
+
     cd /d "%INSTALL_DIR%"
-    git fetch origin main
-    git reset --hard origin/main
+    git fetch origin %BRANCH% --quiet
+    for /f %%a in ('git rev-list HEAD..origin/%BRANCH% --count') do set "BEHIND=%%a"
+
+    if !BEHIND! gtr 0 (
+        echo   [92mUpdate available[0m (!BEHIND! commits)
+        choice /C YN /M "   Update now?" /N
+        if !errorlevel! equ 2 goto :end
+        git pull origin %BRANCH% --ff-only || goto :fail
+    ) else (
+        echo   You are already up to date.
+    )
 ) else (
-    echo Cloning Private MallCord...
-    git clone "%REPO_URL%" "%INSTALL_DIR%"
+    echo   Cloning Private MallCord...
+    git clone "%REPO_URL%" "%INSTALL_DIR%" || goto :fail
     cd /d "%INSTALL_DIR%"
 )
 
-echo Installing dependencies...
-call pnpm install --no-frozen-lockfile
+:build
+echo   Installing dependencies...
+call pnpm install --frozen-lockfile || goto :fail
 
-echo Building...
-call pnpm build
+echo   Building...
+call pnpm build || goto :fail
 
-echo Injecting into Discord...
+echo   Injecting into Discord...
 call node scripts\runInstaller.mjs -- --install
 
 echo.
-echo ============================================
-echo Private MallCord installed successfully!
-echo Start Discord to load it.
-echo ============================================
+echo   =====================================================
+echo     Private MallCord %VERSION% installed/updated successfully!
+echo   =====================================================
+
+choice /C YN /M "   Start Discord now?" /N
+if !errorlevel! equ 1 call :startdiscord
 goto :end
 
-:: ===================== CHECK FOR UPDATES =====================
-:check_update
-if not exist "%INSTALL_DIR%\.git" (
-    echo Private MallCord not found.
-    goto :fail
-)
-cd /d "%INSTALL_DIR%"
-echo Checking for updates...
-git fetch origin main
-git log HEAD..origin/main --oneline
+:: Manual Discord Path
+:manualdiscordpath
 echo.
-choice /C YN /M "Update now?"
-if !errorlevel! equ 1 (
-    taskkill /F /IM Discord* >nul 2>&1
-    git reset --hard origin/main
-    call pnpm install --no-frozen-lockfile
-    call pnpm build
-    call node scripts\runInstaller.mjs -- --install
-    echo Update completed successfully!
+echo   Enter the full path to your Discord installation folder:
+echo   Example: C:\Users\YourName\AppData\Local\Discord
+echo.
+set /p "DISCORD_PATH=Path: "
+if exist "%DISCORD_PATH%" (
+    echo   [92mPath saved successfully![0m
+) else (
+    echo   [93mWarning:[0m The path does not exist, but it was saved.
+)
+pause
+goto :end
+
+:: Improved Auto Detect
+:autodetectdiscord
+    echo   Auto-detecting Discord...
+    for %%d in (Discord DiscordPTB DiscordCanary) do (
+        if exist "%LOCALAPPDATA%\%%d\Update.exe" (
+            set "DISCORD_PATH=%LOCALAPPDATA%\%%d"
+            echo   Detected: %%d
+            goto :eof
+        )
+    )
+    echo   [93mCould not auto-detect Discord.[0m
+    echo   Please use option [6] to set path manually.
+    set "DISCORD_PATH="
+    goto :eof
+
+:: Check for Updates
+:checkupdates
+if not exist "%INSTALL_DIR%\.git" (echo   Private MallCord is not installed yet. & goto :fail)
+cd /d "%INSTALL_DIR%"
+echo   Checking for updates...
+git fetch origin %BRANCH% --quiet
+for /f %%a in ('git rev-list HEAD..origin/%BRANCH% --count') do set "BEHIND=%%a"
+if !BEHIND! gtr 0 (
+    echo   [92mUpdate available![0m (!BEHIND! commits behind)
+) else (
+    echo   [92mYou are up to date![0m
+)
+pause
+goto :end
+
+:: Force Reinstall
+:forcereinstall
+echo   [93mForce Clean Reinstall[0m
+if exist "%INSTALL_DIR%" rmdir /s /q "%INSTALL_DIR%"
+goto :install
+
+:: Repair
+:repair
+if not exist "%INSTALL_DIR%\.git" (echo   Not installed. & goto :fail)
+cd /d "%INSTALL_DIR%"
+echo   Repairing installation...
+call pnpm install --frozen-lockfile
+call pnpm build
+call node scripts\runInstaller.mjs -- --install
+echo   Repair completed.
+pause
+goto :end
+
+:: Discord Selector
+:discordselector
+echo   [1] Stable   [2] PTB   [3] Canary
+choice /C 123 /M "   Choose client"
+if !errorlevel! equ 1 start "" "%LOCALAPPDATA%\Discord\Update.exe" --processStart Discord.exe
+if !errorlevel! equ 2 start "" "%LOCALAPPDATA%\DiscordPTB\Update.exe" --processStart DiscordPTB.exe
+if !errorlevel! equ 3 start "" "%LOCALAPPDATA%\DiscordCanary\Update.exe" --processStart DiscordCanary.exe
+goto :end
+
+:: Open Repository
+:openrepo
+start "" "%REPO_URL%"
+echo   GitHub repository opened.
+goto :end
+
+:: View Log
+:viewlog
+if exist "%LOGFILE%" (
+    notepad "%LOGFILE%"
+) else (
+    echo   No log file found yet.
 )
 goto :end
 
-:: ===================== UNINSTALL =====================
+:: Uninstall
 :uninstall
-if not exist "%INSTALL_DIR%\.git" (
-    echo Private MallCord not found.
-    goto :fail
-)
-echo Found at %INSTALL_DIR%.
+taskkill /f /im discord.exe >nul 2>&1
+if not exist "%INSTALL_DIR%\.git" (echo   Private MallCord not found. & goto :fail)
 cd /d "%INSTALL_DIR%"
 call node scripts\runInstaller.mjs -- --uninstall
 
-echo.
-choice /C YN /M "Also delete folder?"
+choice /C YN /M "   Delete the PrivateMallCord folder and backups?" /N
 if !errorlevel! equ 1 (
-    cd /d "%USERPROFILE%"
+    cd ..
     rmdir /s /q "%INSTALL_DIR%"
-    echo Folder deleted.
+    echo   Folder deleted.
 )
-echo Private MallCord uninstalled. Restart Discord.
+echo   Private MallCord uninstalled successfully.
 goto :end
 
 :fail
-echo Failed. See errors above.
+echo   [91mOperation failed.[0m Check the log file for details.
 :end
+echo.
+call :log "Script finished"
 pause
 endlocal
+exit /b
+
+:: Helper Functions
+:startdiscord
+    if exist "%LOCALAPPDATA%\Discord\Update.exe" start "" "%LOCALAPPDATA%\Discord\Update.exe" --processStart Discord.exe
+    if exist "%LOCALAPPDATA%\DiscordPTB\Update.exe" start "" "%LOCALAPPDATA%\DiscordPTB\Update.exe" --processStart DiscordPTB.exe
+    if exist "%LOCALAPPDATA%\DiscordCanary\Update.exe" start "" "%LOCALAPPDATA%\DiscordCanary\Update.exe" --processStart DiscordCanary.exe
+    goto :eof
+
+:log
+    if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%" 2>nul
+    echo [%DATE% %TIME%] %* >> "%LOGFILE%" 2>nul
+    goto :eof
