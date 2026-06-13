@@ -2,32 +2,39 @@
 setlocal enabledelayedexpansion
 chcp 65001 >nul 2>&1
 
-echo ================================================
-echo         Private MallCord Setup
-echo ================================================
-echo.
+:: ================================================
+:: Private MallCord Setup
+:: Run as normal user
+:: ================================================
 
+set "REPO_URL=https://github.com/Sonnyasd/MallCord"
+set "INSTALL_DIR=%USERPROFILE%\PrivateMallCord"
+
+echo.
+echo +---------------------------------+
+echo ^|   Private MallCord Setup        ^|
+echo +---------------------------------+
+echo.
 echo What would you like to do?
 echo [1] Install / Update
 echo [2] Check for Updates
 echo [3] Uninstall
-echo [4] Exit
 echo.
-choice /C 1234 /M "Choose an option"
-
-set "CHOICE=!errorlevel!"
-
-if !CHOICE! equ 4 goto end
-if !CHOICE! equ 3 goto uninstall
-if !CHOICE! equ 2 goto check_update
-
-:: ==================== INSTALL / UPDATE ====================
+choice /C 123 /M "Choose an option"
+set "MODE_CHOICE=!errorlevel!"
 echo.
+
+if !MODE_CHOICE! equ 3 goto :uninstall
+if !MODE_CHOICE! equ 2 goto :check_update
+
+:: ===================== INSTALL / UPDATE =====================
 net session >nul 2>&1
 if !errorlevel! equ 0 (
-    echo WARNING: Running as Administrator may break Discord.
-    choice /C YN /M "Continue anyway?"
-    if !errorlevel! equ 2 goto end
+    echo WARNING: You are running as Administrator.
+    echo This can break Discord. Run as normal user instead.
+    echo.
+    choice /C YN /M "Continue anyway"
+    if !errorlevel! equ 2 goto :end
 )
 
 echo Closing Discord...
@@ -38,22 +45,19 @@ taskkill /F /IM DiscordCanary.exe >nul 2>&1
 where git >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: git not found. Install from https://git-scm.com/download/win
-    pause
-    goto end
+    goto :fail
 )
 
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ERROR: Node.js not found. Install from https://nodejs.org
-    pause
-    goto end
+    echo ERROR: Node.js not found. Install LTS from https://nodejs.org
+    goto :fail
 )
 
 node -e "if(parseInt(process.version.slice(1))<18)process.exit(1)" >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: Node.js v18+ required.
-    pause
-    goto end
+    goto :fail
 )
 
 where pnpm >nul 2>&1
@@ -63,21 +67,16 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo Updating / Installing Private MallCord...
-
-set "INSTALL_DIR=%USERPROFILE%\PrivateMallCord"
-set "REPO_URL=https://github.com/Sonnyasd/MallCord"
-
 if exist "%INSTALL_DIR%\.git" (
+    echo Private MallCord already found.
+    echo Updating to latest version...
     cd /d "%INSTALL_DIR%"
     git fetch origin main
     git reset --hard origin/main
-    echo [OK] Repository updated.
 ) else (
-    if exist "%INSTALL_DIR%" rmdir /s /q "%INSTALL_DIR%"
+    echo Cloning Private MallCord...
     git clone "%REPO_URL%" "%INSTALL_DIR%"
     cd /d "%INSTALL_DIR%"
-    echo [OK] Cloned.
 )
 
 echo Installing dependencies...
@@ -90,18 +89,17 @@ echo Injecting into Discord...
 call node scripts\runInstaller.mjs -- --install
 
 echo.
-echo ================================================
-echo   Private MallCord installed successfully!
-echo   Start Discord to load it.
-echo ================================================
-pause
-goto end
+echo ============================================
+echo Private MallCord installed successfully!
+echo Start Discord to load it.
+echo ============================================
+goto :end
 
+:: ===================== CHECK FOR UPDATES =====================
 :check_update
 if not exist "%INSTALL_DIR%\.git" (
-    echo Private MallCord is not installed yet.
-    pause
-    goto end
+    echo Private MallCord is not installed.
+    goto :fail
 )
 cd /d "%INSTALL_DIR%"
 echo Checking for updates...
@@ -119,33 +117,31 @@ if !errorlevel! equ 1 (
     call node scripts\runInstaller.mjs -- --install
     echo Update completed successfully!
 )
-pause
-goto end
+goto :end
 
+:: ===================== UNINSTALL =====================
 :uninstall
-if not exist "%INSTALL_DIR%" (
+if not exist "%INSTALL_DIR%\.git" (
     echo Private MallCord not found.
-    pause
-    goto end
+    goto :fail
 )
-echo Found at %INSTALL_DIR%
-taskkill /F /IM Discord.exe >nul 2>&1
-taskkill /F /IM DiscordPTB.exe >nul 2>&1
-taskkill /F /IM DiscordCanary.exe >nul 2>&1
-
+echo Found at %INSTALL_DIR%.
+echo Removing from Discord...
 cd /d "%INSTALL_DIR%"
 call node scripts\runInstaller.mjs -- --uninstall
 
 echo.
-choice /C YN /M "Also delete folder?"
+choice /C YN /M "Also delete the folder?"
 if !errorlevel! equ 1 (
     cd /d "%USERPROFILE%"
     rmdir /s /q "%INSTALL_DIR%"
     echo Folder deleted.
 )
 echo Private MallCord uninstalled. Restart Discord.
-pause
-goto end
+goto :end
 
+:fail
+echo Failed. See errors above.
 :end
+pause
 endlocal
