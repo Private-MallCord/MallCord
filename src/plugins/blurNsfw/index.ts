@@ -1,6 +1,6 @@
 /*
  * Vencord, a Discord client mod
- * Copyright (c) 2025 Vendicated and contributors
+ * Copyright (c) 2025 sonnyasd and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -44,7 +44,7 @@ export default definePlugin({
     name: "BlurNSFW",
     description: "Blur attachments in NSFW channels until hovered",
     tags: ["Privacy", "Appearance"],
-    authors: [Devs.Ven],
+    authors: [Devs.sonnyasd],
     isModified: true,
     settings,
 
