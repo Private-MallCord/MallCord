@@ -19,7 +19,6 @@ echo   ^|        Private MallCord Setup %VERSION%     ^|
 echo   +---------------------------------------------+
 echo.
 
-:: ── Main Menu ───────────────────────────────────────────────────────────────
 echo   What would you like to do?
 echo.
 echo   [1] Install / Update
@@ -54,9 +53,6 @@ if !MODE_CHOICE! equ 2 goto :checkupdates
 if !MODE_CHOICE! equ 3 goto :forcereinstall
 if !MODE_CHOICE! equ 4 goto :repair
 
-:: ════════════════════════════════════════════════════════════
-::              INSTALL / UPDATE
-:: ════════════════════════════════════════════════════════════
 :install
 call :log "=== Starting Install/Update %VERSION% ==="
 
@@ -95,7 +91,6 @@ if exist "%INSTALL_DIR%\.git" (
     cd /d "%INSTALL_DIR%"
 )
 
-:build
 echo   Installing dependencies...
 call pnpm install --frozen-lockfile || goto :fail
 
@@ -114,62 +109,49 @@ choice /C YN /M "   Start Discord now?" /N
 if !errorlevel! equ 1 call :startdiscord
 goto :end
 
-:: Manual Discord Path
 :manualdiscordpath
 echo.
 echo   Enter the full path to your Discord installation folder:
 echo   Example: C:\Users\YourName\AppData\Local\Discord
 echo.
 set /p "DISCORD_PATH=Path: "
-if exist "%DISCORD_PATH%" (
-    echo   [92mPath saved successfully![0m
-) else (
-    echo   [93mWarning:[0m The path does not exist, but it was saved.
-)
+if exist "%DISCORD_PATH%" (echo   [92mPath saved successfully![0m) else (echo   [93mWarning: Path does not exist, but saved.[0m)
 pause
 goto :end
 
-:: Improved Auto Detect
 :autodetectdiscord
-    echo   Auto-detecting Discord...
-    for %%d in (Discord DiscordPTB DiscordCanary) do (
-        if exist "%LOCALAPPDATA%\%%d\Update.exe" (
-            set "DISCORD_PATH=%LOCALAPPDATA%\%%d"
-            echo   Detected: %%d
-            goto :eof
-        )
+echo   Auto-detecting Discord...
+for %%d in (Discord DiscordPTB DiscordCanary) do (
+    if exist "%LOCALAPPDATA%\%%d\Update.exe" (
+        set "DISCORD_PATH=%LOCALAPPDATA%\%%d"
+        echo   Detected: %%d
+        goto :eof
     )
-    echo   [93mCould not auto-detect Discord.[0m
-    echo   Please use option [6] to set path manually.
-    set "DISCORD_PATH="
-    goto :eof
+)
+echo   [93mCould not auto-detect Discord.[0m
+echo   Use option [6] to set manually.
+set "DISCORD_PATH="
+goto :eof
 
-:: Check for Updates
 :checkupdates
 if not exist "%INSTALL_DIR%\.git" (echo   Private MallCord is not installed yet. & goto :fail)
 cd /d "%INSTALL_DIR%"
 echo   Checking for updates...
 git fetch origin %BRANCH% --quiet
 for /f %%a in ('git rev-list HEAD..origin/%BRANCH% --count') do set "BEHIND=%%a"
-if !BEHIND! gtr 0 (
-    echo   [92mUpdate available![0m (!BEHIND! commits behind)
-) else (
-    echo   [92mYou are up to date![0m
-)
+if !BEHIND! gtr 0 (echo   [92mUpdate available![0m (!BEHIND! commits behind)) else (echo   [92mYou are up to date![0m)
 pause
 goto :end
 
-:: Force Reinstall
 :forcereinstall
 echo   [93mForce Clean Reinstall[0m
 if exist "%INSTALL_DIR%" rmdir /s /q "%INSTALL_DIR%"
 goto :install
 
-:: Repair
 :repair
 if not exist "%INSTALL_DIR%\.git" (echo   Not installed. & goto :fail)
 cd /d "%INSTALL_DIR%"
-echo   Repairing installation...
+echo   Repairing...
 call pnpm install --frozen-lockfile
 call pnpm build
 call node scripts\runInstaller.mjs -- --install
@@ -177,7 +159,6 @@ echo   Repair completed.
 pause
 goto :end
 
-:: Discord Selector
 :discordselector
 echo   [1] Stable   [2] PTB   [3] Canary
 choice /C 123 /M "   Choose client"
@@ -186,22 +167,15 @@ if !errorlevel! equ 2 start "" "%LOCALAPPDATA%\DiscordPTB\Update.exe" --processS
 if !errorlevel! equ 3 start "" "%LOCALAPPDATA%\DiscordCanary\Update.exe" --processStart DiscordCanary.exe
 goto :end
 
-:: Open Repository
 :openrepo
 start "" "%REPO_URL%"
 echo   GitHub repository opened.
 goto :end
 
-:: View Log
 :viewlog
-if exist "%LOGFILE%" (
-    notepad "%LOGFILE%"
-) else (
-    echo   No log file found yet.
-)
+if exist "%LOGFILE%" (notepad "%LOGFILE%") else (echo   No log file found yet.)
 goto :end
 
-:: Uninstall
 :uninstall
 taskkill /f /im discord.exe >nul 2>&1
 if not exist "%INSTALL_DIR%\.git" (echo   Private MallCord not found. & goto :fail)
@@ -226,7 +200,6 @@ pause
 endlocal
 exit /b
 
-:: Helper Functions
 :startdiscord
     if exist "%LOCALAPPDATA%\Discord\Update.exe" start "" "%LOCALAPPDATA%\Discord\Update.exe" --processStart Discord.exe
     if exist "%LOCALAPPDATA%\DiscordPTB\Update.exe" start "" "%LOCALAPPDATA%\DiscordPTB\Update.exe" --processStart DiscordPTB.exe

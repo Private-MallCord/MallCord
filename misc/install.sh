@@ -15,7 +15,7 @@ echo "        Private MallCord Setup $VERSION         "
 echo "================================================"
 echo
 
-# Admin/root check
+# Root warning
 if [ "$EUID" -eq 0 ]; then
     echo "⚠️  Warning: Do not run as root!"
     read -p "Continue anyway? [y/N]: " confirm
@@ -35,7 +35,10 @@ echo
 read -p "Choose an option [1-7]: " CHOICE
 
 case $CHOICE in
-    7) echo "Goodbye!"; exit 0 ;;
+    7)
+        echo "Goodbye!"
+        exit 0
+        ;;
 
     5)  # Rollback
         if [ ! -d "$BACKUP_DIR" ]; then
@@ -54,16 +57,18 @@ case $CHOICE in
             echo "❌ Private MallCord not found."
             exit 1
         fi
+
         echo "Closing Discord..."
         pkill -f Discord 2>/dev/null || true
         pkill -f discord 2>/dev/null || true
 
-        cd "$INSTALL_DIR" 2>/dev/null || { echo "Cannot access installation."; exit 1; }
+        cd "$INSTALL_DIR" 2>/dev/null || { echo "Cannot access installation directory."; exit 1; }
+
         echo "Removing from Discord..."
         node scripts/runInstaller.mjs -- --uninstall || echo "⚠️  Warning during uninject."
 
         echo
-        read -p "Delete the PrivateMallCord folder too? [y/N]: " DEL
+        read -p "Delete the PrivateMallCord folder and backup too? [y/N]: " DEL
         if [[ $DEL =~ ^[Yy]$ ]]; then
             rm -rf "$INSTALL_DIR" "$BACKUP_DIR"
             echo "✅ Folder and backup deleted."
@@ -72,19 +77,20 @@ case $CHOICE in
         exit 0
         ;;
 
-    2)  # Check Updates
+    2)  # Check for Updates
         if [ ! -d "$INSTALL_DIR/.git" ]; then
             echo "❌ Private MallCord is not installed yet."
             exit 1
         fi
         cd "$INSTALL_DIR"
-        echo "Checking for updates..."
+        echo "Checking for updates on GitHub..."
         git fetch origin "$BRANCH" --quiet
-        BEHIND=$(git rev-list HEAD..origin/"$BRANCH" --count)
+        BEHIND=$(git rev-list HEAD..origin/"$BRANCH" --count 2>/dev/null)
+
         if [ "$BEHIND" -gt 0 ]; then
             echo "✅ Update available! ($BEHIND commits behind)"
             read -p "Update now? [y/N]: " UPD
-            [[ $UPD =~ ^[Yy]$ ]] && exec "$0"   # Restart script to update
+            [[ $UPD =~ ^[Yy]$ ]] && exec "$0"
         else
             echo "✅ You are already up to date."
         fi
@@ -109,7 +115,7 @@ command -v node >/dev/null || { echo "❌ Node.js not found. Install from https:
 
 NODE_VER=$(node -e "console.log(parseInt(process.version.slice(1)))" 2>/dev/null)
 if [ "${NODE_VER:-0}" -lt 18 ]; then
-    echo "❌ Node.js v18+ required. Current version is lower."
+    echo "❌ Node.js v18+ required."
     exit 1
 fi
 
@@ -118,7 +124,7 @@ if ! command -v pnpm >/dev/null; then
     npm install -g pnpm || { echo "❌ Failed to install pnpm."; exit 1; }
 fi
 
-# Backup current installation
+# Create backup before making changes
 if [ -d "$INSTALL_DIR" ]; then
     echo "Creating backup..."
     rm -rf "$BACKUP_DIR"
@@ -142,7 +148,7 @@ else
 fi
 
 echo "Installing dependencies..."
-pnpm install --frozen-lockfile || { echo "❌ Dependencies failed."; exit 1; }
+pnpm install --frozen-lockfile || { echo "❌ Dependencies installation failed."; exit 1; }
 
 echo "Building..."
 pnpm build || { echo "❌ Build failed."; exit 1; }
