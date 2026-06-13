@@ -21,27 +21,10 @@ set "RESET=%ESC%0m"
 :print_header
 cls
 echo.
-echo %CYAN%╔══════════════════════════════════════════════════════════════╗%RESET%
-echo %CYAN%║%RESET%                 %GREEN%Private MallCord Setup%RESET%                 %CYAN%║%RESET%
-echo %CYAN%╚══════════════════════════════════════════════════════════════╝%RESET%
+echo %CYAN%============================================================%RESET%
+echo %CYAN%               Private MallCord Setup%RESET%
+echo %CYAN%============================================================%RESET%
 echo.
-goto :eof
-
-:check_admin
-net session >nul 2>&1
-if !errorlevel! equ 0 (
-    echo %YELLOW%WARNING:%RESET% You are running as Administrator. This may break Discord.
-    choice /C YN /M "   Continue anyway?"
-    if !errorlevel! equ 2 exit /b 1
-)
-goto :eof
-
-:close_discord
-echo %BLUE%Closing Discord processes...%RESET%
-taskkill /F /IM Discord.exe >nul 2>&1
-taskkill /F /IM DiscordPTB.exe >nul 2>&1
-taskkill /F /IM DiscordCanary.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
 goto :eof
 
 call :print_header
@@ -110,19 +93,9 @@ if exist "%INSTALL_DIR%\.git" (
 
 echo %BLUE%Installing dependencies...%RESET%
 call pnpm install --no-frozen-lockfile
-if %errorlevel% neq 0 (
-    echo %RED%ERROR:%RESET% Failed to install dependencies.
-    pause
-    goto :end
-)
 
-echo %BLUE%Building Private MallCord...%RESET%
+echo %BLUE%Building...%RESET%
 call pnpm build
-if %errorlevel% neq 0 (
-    echo %RED%ERROR:%RESET% Build failed.
-    pause
-    goto :end
-)
 
 echo %BLUE%Injecting into Discord...%RESET%
 call node "%INSTALL_DIR%\scripts\runInstaller.mjs" -- --install
@@ -135,7 +108,23 @@ echo %GREEN%========================================%RESET%
 pause
 goto :end
 
-:: ===================== CHECK FOR UPDATES =====================
+:check_admin
+net session >nul 2>&1
+if !errorlevel! equ 0 (
+    echo %YELLOW%WARNING:%RESET% You are running as Administrator. This may break Discord.
+    choice /C YN /M "   Continue anyway?"
+    if !errorlevel! equ 2 exit /b 1
+)
+goto :eof
+
+:close_discord
+echo %BLUE%Closing Discord processes...%RESET%
+taskkill /F /IM Discord.exe >nul 2>&1
+taskkill /F /IM DiscordPTB.exe >nul 2>&1
+taskkill /F /IM DiscordCanary.exe >nul 2>&1
+timeout /t 2 /nobreak >nul
+goto :eof
+
 :check_update
 if not exist "%INSTALL_DIR%\.git" (
     echo %RED%Private MallCord is not installed yet.%RESET%
@@ -159,7 +148,6 @@ if !errorlevel! equ 1 (
 pause
 goto :end
 
-:: ===================== UNINSTALL =====================
 :uninstall
 if not exist "%INSTALL_DIR%" (
     echo %RED%Private MallCord not found.%RESET%

@@ -52,23 +52,24 @@ read -p "   Choose an option [1-4]: " CHOICE
 
 case $CHOICE in
     4) exit 0 ;;
-    3) exec bash -c "
-        if [ ! -d \"$INSTALL_DIR\" ]; then
-            echo -e \"${RED}Private MallCord not found.${NC}\"
+    3)
+        if [ ! -d "$INSTALL_DIR" ]; then
+            error "Private MallCord not found."
             exit 1
         fi
         close_discord
-        cd \"$INSTALL_DIR\"
-        step \"Removing from Discord...\"
-        node scripts/runInstaller.mjs -- --uninstall || warn \"Uninject had some issues.\"
+        cd "$INSTALL_DIR"
+        step "Removing from Discord..."
+        node scripts/runInstaller.mjs -- --uninstall || warn "Uninject had some issues."
         echo
-        read -p \"   Also delete the PrivateMallCord folder? [y/N]: \" DEL
-        if [[ \$DEL =~ ^[Yy]$ ]]; then
-            rm -rf \"$INSTALL_DIR\"
-            ok \"Folder deleted.\"
+        read -p "   Also delete the PrivateMallCord folder? [y/N]: " DEL
+        if [[ $DEL =~ ^[Yy]$ ]]; then
+            rm -rf "$INSTALL_DIR"
+            ok "Folder deleted."
         fi
-        echo -e \"${GREEN}Private MallCord uninstalled. Restart Discord.${NC}\"
-        " ;;
+        echo -e "${GREEN}Private MallCord uninstalled. Restart Discord.${NC}"
+        exit 0
+        ;;
     2)
         if [ ! -d "$INSTALL_DIR/.git" ]; then
             error "Private MallCord is not installed yet."
@@ -85,7 +86,7 @@ case $CHOICE in
             close_discord
             git reset --hard origin/main
             step "Installing dependencies..."
-            pnpm install --frozen-lockfile
+            pnpm install --no-frozen-lockfile
             step "Building..."
             pnpm build
             step "Injecting into Discord..."
@@ -132,7 +133,7 @@ else
 fi
 
 step "Installing dependencies..."
-pnpm install --frozen-lockfile || { error "Dependencies installation failed."; exit 1; }
+pnpm install --no-frozen-lockfile || { error "Dependencies installation failed."; exit 1; }
 ok "Dependencies installed."
 
 step "Building Private MallCord..."
