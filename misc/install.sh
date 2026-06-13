@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ================================================
-# Private MallCord Setup (Linux/macOS)
+# Private MallCord - Installer (Linux/macOS)
 # ================================================
 
 REPO_URL="https://github.com/Sonnyasd/MallCord"
@@ -9,7 +9,7 @@ BACKUP_DIR="$HOME/PrivateMallCord_Backup"
 
 echo
 echo "================================================"
-echo "     Private MallCord Setup"
+echo "     Private MallCord Setup                     "
 echo "================================================"
 echo
 
@@ -22,66 +22,63 @@ echo "[5] Exit"
 echo
 read -p "Choose an option [1-5]: " CHOICE
 
-if [ "$CHOICE" = "5" ]; then
-    exit 0
-fi
-
-if [ "$CHOICE" = "4" ]; then
-    if [ ! -d "$BACKUP_DIR" ]; then
-        echo "No backup found."
-        exit 1
-    fi
-    echo "Restoring from backup..."
-    rm -rf "$INSTALL_DIR"
-    cp -r "$BACKUP_DIR" "$INSTALL_DIR"
-    echo "Rollback completed successfully!"
-    exit 0
-fi
-
-if [ "$CHOICE" = "3" ]; then
-    if [ ! -d "$INSTALL_DIR" ]; then
-        echo "Private MallCord not found."
-        exit 1
-    fi
-    echo "Closing Discord..."
-    pkill -f Discord 2>/dev/null || true
-    pkill -f discord 2>/dev/null || true
-
-    cd "$INSTALL_DIR"
-    echo "Removing from Discord..."
-    node scripts/runInstaller.mjs -- --uninstall || echo "Warning: Uninject had some issues."
-
-    echo
-    read -p "Also delete the PrivateMallCord folder? [y/N]: " DEL
-    if [[ $DEL =~ ^[Yy]$ ]]; then
+case $CHOICE in
+    5) exit 0 ;;
+    4)
+        if [ ! -d "$BACKUP_DIR" ]; then
+            echo "No backup found."
+            exit 1
+        fi
+        echo "Restoring from backup..."
         rm -rf "$INSTALL_DIR"
-        echo "Folder deleted."
-    fi
-    echo "Private MallCord uninstalled. Restart Discord."
-    exit 0
-fi
-
-if [ "$CHOICE" = "2" ]; then
-    if [ ! -d "$INSTALL_DIR/.git" ]; then
-        echo "Private MallCord is not installed yet."
-        exit 1
-    fi
-    cd "$INSTALL_DIR"
-    echo "Checking for updates..."
-    git fetch origin main
-    git log HEAD..origin/main --oneline
-    echo
-    read -p "Update now? [y/N]: " UPD
-    if [[ $UPD =~ ^[Yy]$ ]]; then
+        cp -r "$BACKUP_DIR" "$INSTALL_DIR"
+        echo "Rollback completed successfully!"
+        exit 0
+        ;;
+    3)
+        if [ ! -d "$INSTALL_DIR" ]; then
+            echo "Private MallCord not found."
+            exit 1
+        fi
+        echo "Closing Discord..."
         pkill -f Discord 2>/dev/null || true
-        git reset --hard origin/main
-        pnpm install --no-frozen-lockfile
-        pnpm build
-        node scripts/runInstaller.mjs -- --install
-        echo "Update completed successfully!"
-    fi
-    exit 0
-fi
+        pkill -f discord 2>/dev/null || true
+
+        cd "$INSTALL_DIR" 2>/dev/null || { echo "Cannot access installation directory."; exit 1; }
+        echo "Removing from Discord..."
+        node scripts/runInstaller.mjs -- --uninstall || echo "Warning: Uninject had some issues."
+
+        echo
+        read -p "Also delete the PrivateMallCord folder? [y/N]: " DEL
+        if [[ $DEL =~ ^[Yy]$ ]]; then
+            rm -rf "$INSTALL_DIR"
+            echo "Folder deleted."
+        fi
+        echo "Private MallCord uninstalled. Restart Discord."
+        exit 0
+        ;;
+    2)
+        if [ ! -d "$INSTALL_DIR/.git" ]; then
+            echo "Private MallCord is not installed yet."
+            exit 1
+        fi
+        cd "$INSTALL_DIR"
+        echo "Checking for updates..."
+        git fetch origin main
+        git log HEAD..origin/main --oneline
+        echo
+        read -p "Update now? [y/N]: " UPD
+        if [[ $UPD =~ ^[Yy]$ ]]; then
+            pkill -f Discord 2>/dev/null || true
+            git reset --hard origin/main
+            pnpm install --no-frozen-lockfile
+            pnpm build
+            node scripts/runInstaller.mjs -- --install
+            echo "Update completed successfully!"
+        fi
+        exit 0
+        ;;
+esac
 
 # ===================== INSTALL / UPDATE =====================
 if [ "$EUID" -eq 0 ]; then
@@ -105,10 +102,10 @@ fi
 
 if ! command -v pnpm >/dev/null; then
     echo "Installing pnpm..."
-    npm install -g pnpm
+    npm install -g pnpm || { echo "Failed to install pnpm."; exit 1; }
 fi
 
-# Create backup before updating
+# Backup before update
 if [ -d "$INSTALL_DIR" ]; then
     echo "Creating backup..."
     rm -rf "$BACKUP_DIR"
@@ -125,19 +122,19 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     echo "[OK] Repository updated."
 else
     if [ -d "$INSTALL_DIR" ]; then rm -rf "$INSTALL_DIR"; fi
-    git clone "$REPO_URL" "$INSTALL_DIR"
+    git clone "$REPO_URL" "$INSTALL_DIR" || { echo "Clone failed."; exit 1; }
     cd "$INSTALL_DIR"
     echo "[OK] Cloned successfully."
 fi
 
 echo "Installing dependencies..."
-pnpm install --no-frozen-lockfile
+pnpm install --no-frozen-lockfile || { echo "Dependencies installation failed."; exit 1; }
 
 echo "Building..."
-pnpm build
+pnpm build || { echo "Build failed."; exit 1; }
 
 echo "Injecting into Discord..."
-node scripts/runInstaller.mjs -- --install
+node scripts/runInstaller.mjs -- --install || echo "Warning: Injection may have issues."
 
 echo
 echo "================================================"
