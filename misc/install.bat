@@ -44,7 +44,6 @@ taskkill /F /IM DiscordCanary.exe >nul 2>&1
 timeout /t 2 /nobreak >nul
 goto :eof
 
-:: ===================== MAIN MENU =====================
 call :print_header
 
 echo   %CYAN%What would you like to do?%RESET%
@@ -110,10 +109,20 @@ if exist "%INSTALL_DIR%\.git" (
 )
 
 echo %BLUE%Installing dependencies...%RESET%
-call pnpm install --frozen-lockfile
+call pnpm install --no-frozen-lockfile
+if %errorlevel% neq 0 (
+    echo %RED%ERROR:%RESET% Failed to install dependencies.
+    pause
+    goto :end
+)
 
 echo %BLUE%Building Private MallCord...%RESET%
 call pnpm build
+if %errorlevel% neq 0 (
+    echo %RED%ERROR:%RESET% Build failed.
+    pause
+    goto :end
+)
 
 echo %BLUE%Injecting into Discord...%RESET%
 call node "%INSTALL_DIR%\scripts\runInstaller.mjs" -- --install
@@ -133,23 +142,19 @@ if not exist "%INSTALL_DIR%\.git" (
     pause
     goto :end
 )
-
 cd /d "%INSTALL_DIR%"
 echo %BLUE%Checking for updates...%RESET%
 git fetch origin main
-
 git log HEAD..origin/main --oneline
 echo.
 choice /C YN /M "   Update now?"
 if !errorlevel! equ 1 (
     call :close_discord
     git reset --hard origin/main
-    call pnpm install --frozen-lockfile
+    call pnpm install --no-frozen-lockfile
     call pnpm build
     call node "%INSTALL_DIR%\scripts\runInstaller.mjs" -- --install
     echo %GREEN%Update completed successfully!%RESET%
-) else (
-    echo %YELLOW%Update cancelled.%RESET%
 )
 pause
 goto :end
@@ -161,7 +166,6 @@ if not exist "%INSTALL_DIR%" (
     pause
     goto :end
 )
-
 call :close_discord
 cd /d "%INSTALL_DIR%"
 echo %BLUE%Removing from Discord...%RESET%
@@ -174,7 +178,6 @@ if !errorlevel! equ 1 (
     rmdir /s /q "%INSTALL_DIR%"
     echo %GREEN%Folder deleted.%RESET%
 )
-
 echo %GREEN%Private MallCord uninstalled. Restart Discord.%RESET%
 pause
 goto :end
