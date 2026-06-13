@@ -22,7 +22,7 @@ set "MODE=!errorlevel!"
 if !MODE! equ 3 goto uninstall
 if !MODE! equ 2 goto checkupdate
 
-:: ==================== INSTALL / UPDATE ====================
+:: Install / Update
 echo.
 echo Closing Discord...
 taskkill /F /IM Discord.exe >nul 2>&1
@@ -43,19 +43,18 @@ if %errorlevel% neq 0 (
     goto end
 )
 
-echo.
-echo Installing / Updating Private MallCord...
+echo Installing / Updating...
 
 if exist "%INSTALL_DIR%\.git" (
     cd /d "%INSTALL_DIR%"
     git fetch origin main
     git reset --hard origin/main
-    echo Repository updated successfully.
+    echo Repository updated.
 ) else (
     if exist "%INSTALL_DIR%" rmdir /s /q "%INSTALL_DIR%"
     git clone "%REPO_URL%" "%INSTALL_DIR%"
     cd /d "%INSTALL_DIR%"
-    echo Repository cloned successfully.
+    echo Cloned successfully.
 )
 
 echo Installing dependencies...
@@ -77,12 +76,11 @@ goto end
 
 :checkupdate
 if not exist "%INSTALL_DIR%\.git" (
-    echo Private MallCord is not installed yet.
+    echo Not installed yet.
     pause
     goto end
 )
 cd /d "%INSTALL_DIR%"
-echo Checking for updates...
 git fetch origin main
 git log HEAD..origin/main --oneline
 echo.
@@ -93,31 +91,23 @@ if !errorlevel! equ 1 (
     pnpm install --no-frozen-lockfile
     pnpm build
     node scripts\runInstaller.mjs -- --install
-    echo Update completed!
+    echo Update successful!
 )
 pause
 goto end
 
 :uninstall
 if not exist "%INSTALL_DIR%" (
-    echo Private MallCord not found.
+    echo Not found.
     pause
     goto end
 )
 cd /d "%INSTALL_DIR%"
-echo Removing from Discord...
 node scripts\runInstaller.mjs -- --uninstall
-
-echo.
 choice /C YN /M "Delete folder too?"
-if !errorlevel! equ 1 (
-    cd /d "%USERPROFILE%"
-    rmdir /s /q "%INSTALL_DIR%"
-    echo Folder deleted.
-)
+if !errorlevel! equ 1 rmdir /s /q "%INSTALL_DIR%"
 echo Uninstalled. Restart Discord.
 pause
-goto end
 
 :end
 endlocal
