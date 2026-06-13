@@ -2,14 +2,6 @@
 setlocal enabledelayedexpansion
 chcp 65001 >nul 2>&1
 
-:: ================================================
-:: Private MallCord Setup
-:: ================================================
-
-set "REPO_URL=https://github.com/Sonnyasd/MallCord"
-set "INSTALL_DIR=%USERPROFILE%\PrivateMallCord"
-
-echo.
 echo ================================================
 echo         Private MallCord Setup
 echo ================================================
@@ -29,11 +21,11 @@ if !CHOICE! equ 4 goto end
 if !CHOICE! equ 3 goto uninstall
 if !CHOICE! equ 2 goto check_update
 
-:: ===================== INSTALL / UPDATE =====================
+:: ==================== INSTALL / UPDATE ====================
 echo.
 net session >nul 2>&1
 if !errorlevel! equ 0 (
-    echo WARNING: You are running as Administrator. This can break Discord.
+    echo WARNING: Running as Administrator may break Discord.
     choice /C YN /M "Continue anyway?"
     if !errorlevel! equ 2 goto end
 )
@@ -52,7 +44,7 @@ if %errorlevel% neq 0 (
 
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ERROR: Node.js not found. Install LTS from https://nodejs.org
+    echo ERROR: Node.js not found. Install from https://nodejs.org
     pause
     goto end
 )
@@ -72,6 +64,10 @@ if %errorlevel% neq 0 (
 
 echo.
 echo Updating / Installing Private MallCord...
+
+set "INSTALL_DIR=%USERPROFILE%\PrivateMallCord"
+set "REPO_URL=https://github.com/Sonnyasd/MallCord"
+
 if exist "%INSTALL_DIR%\.git" (
     cd /d "%INSTALL_DIR%"
     git fetch origin main
@@ -91,7 +87,7 @@ echo Building...
 call pnpm build
 
 echo Injecting into Discord...
-call node "%INSTALL_DIR%\scripts\runInstaller.mjs" -- --install
+call node scripts\runInstaller.mjs -- --install
 
 echo.
 echo ================================================
@@ -101,7 +97,6 @@ echo ================================================
 pause
 goto end
 
-:: ===================== CHECK FOR UPDATES =====================
 :check_update
 if not exist "%INSTALL_DIR%\.git" (
     echo Private MallCord is not installed yet.
@@ -127,7 +122,6 @@ if !errorlevel! equ 1 (
 pause
 goto end
 
-:: ===================== UNINSTALL =====================
 :uninstall
 if not exist "%INSTALL_DIR%" (
     echo Private MallCord not found.
@@ -143,7 +137,7 @@ cd /d "%INSTALL_DIR%"
 call node scripts\runInstaller.mjs -- --uninstall
 
 echo.
-choice /C YN /M "Also delete the PrivateMallCord folder?"
+choice /C YN /M "Also delete folder?"
 if !errorlevel! equ 1 (
     cd /d "%USERPROFILE%"
     rmdir /s /q "%INSTALL_DIR%"
